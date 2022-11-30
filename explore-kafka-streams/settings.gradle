@@ -1,1 +1,3 @@
 rootProject.name = 'explore-kafka-streams'
+include 'greeting-streams'
+
