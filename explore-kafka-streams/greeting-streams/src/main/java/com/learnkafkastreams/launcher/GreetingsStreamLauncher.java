@@ -13,8 +13,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import static com.learnkafkastreams.topology.GreetingsTopology.GREETINGS;
-import static com.learnkafkastreams.topology.GreetingsTopology.GREETINGS_UPPERCASE;
+import static com.learnkafkastreams.topology.GreetingsTopology.*;
 
 @Slf4j
 public class GreetingsStreamLauncher {
@@ -28,14 +27,17 @@ public class GreetingsStreamLauncher {
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "greetings-app"); // consumer group
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // read only the new messages
-        createTopics(config, List.of(GREETINGS, GREETINGS_UPPERCASE));
+        createTopics(config, List.of(GREETINGS, GREETINGS_UPPERCASE, GREETINGS_SPANISH));
 
         var kafkaStreams = new KafkaStreams(greetingsTopology, config);
 
         //This closes the streams anytime the JVM shuts down normally or abruptly.
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
-
-        kafkaStreams.start();
+        try{
+            kafkaStreams.start();
+        }catch (Exception e ){
+            log.error("Exception in starting the Streams : {}", e.getMessage(), e);
+        }
 
     }
 

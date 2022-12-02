@@ -50,6 +50,9 @@ kafka-console-producer --broker-list localhost:9092 --topic greetings
 
 ```
 
+```
+ ./kafka-console-producer.sh --broker-list localhost:9092 --topic greetings --property "key.separator=-" --property "parse.key=true"
+```
 
 #### Consume Messages
 
