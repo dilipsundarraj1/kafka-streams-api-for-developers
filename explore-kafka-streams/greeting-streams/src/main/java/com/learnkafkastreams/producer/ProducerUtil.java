@@ -1,6 +1,5 @@
 package com.learnkafkastreams.producer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -16,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 public class ProducerUtil {
 
 
-    static KafkaProducer producer = new KafkaProducer<String, String>(producerProps());
+    static KafkaProducer<String, String> producer = new KafkaProducer<String, String>(producerProps());
 
     public static Map<String, Object> producerProps(){
 
@@ -28,7 +27,6 @@ public class ProducerUtil {
 
     }
 
-    public static  ObjectMapper objectMapper = new ObjectMapper();
 
     public static RecordMetadata publishMessageSync(String topicName, String key, String message ){
 
@@ -37,7 +35,7 @@ public class ProducerUtil {
 
         try {
             log.info("producerRecord : " + producerRecord);
-            recordMetadata = (RecordMetadata) producer.send(producerRecord).get();
+            recordMetadata = producer.send(producerRecord).get();
         } catch (InterruptedException e) {
             log.error("InterruptedException in  publishMessageSync : {}  ", e.getMessage(), e);
         } catch (ExecutionException e) {
