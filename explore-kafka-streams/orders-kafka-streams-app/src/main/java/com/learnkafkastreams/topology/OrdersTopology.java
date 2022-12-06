@@ -9,6 +9,8 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.*;
 
+import java.math.BigDecimal;
+
 
 @Slf4j
 public class OrdersTopology {
@@ -32,6 +34,7 @@ public class OrdersTopology {
                 .print(Printed.<String, Order>toSysOut().withLabel("orders"));
 
         orderStreams
+                .filter((key, value) -> value.finalAmount().compareTo( new BigDecimal("10.00")) > 0)
                 .split(Named.as("General-restaurant-stream"))
                 .branch(generalPredicate,
                         Branched.withConsumer(generalOrdersStream -> {
