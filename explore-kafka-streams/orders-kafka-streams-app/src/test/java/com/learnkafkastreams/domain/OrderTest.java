@@ -24,11 +24,11 @@ public class OrderTest {
     void orderDomainTest() throws JsonProcessingException {
 
         var orderItems = List.of(
-                new OrderLineItem("Bananas", 2, new BigDecimal("2.00")),
-                new OrderLineItem("Iphone Charger", 1, new BigDecimal("25.00"))
+                new OrderLineItemRecord("Bananas", 2, new BigDecimal("2.00")),
+                new OrderLineItemRecord("Iphone Charger", 1, new BigDecimal("25.00"))
         );
 
-        var order = new Order(12345, "store_1234",
+        var order = new OrderRecord(12345, "store_1234",
                 new BigDecimal("27.00"),
                 OrderType.GENERAL,
                 orderItems,
@@ -43,14 +43,36 @@ public class OrderTest {
     }
 
     @Test
+    void orderRecordDomainTest() throws JsonProcessingException {
+
+        var orderItems = List.of(
+                new OrderLineItemRecord("Bananas", 2, new BigDecimal("2.00")),
+                new OrderLineItemRecord("Iphone Charger", 1, new BigDecimal("25.00"))
+        );
+
+        var order = new OrderRecord(12345, "store_1234",
+                new BigDecimal("27.00"),
+                OrderType.GENERAL,
+                orderItems,
+                LocalDateTime.parse("2022-12-05T08:55:27")
+        );
+
+        var orderJSON = objectMapper.writeValueAsString(order);
+        System.out.println("orderJSON :"+orderJSON);
+        var expectedJSON = "{\"orderId\":12345,\"locationId\":\"store_1234\",\"finalAmount\":27.00,\"orderType\":\"GENERAL\",\"orderLineItems\":[{\"item\":\"Bananas\",\"count\":2,\"amount\":2.00},{\"item\":\"Iphone Charger\",\"count\":1,\"amount\":25.00}],\"orderedDateTime\":\"2022-12-05T08:55:27\"}";
+
+        assertEquals(expectedJSON, orderJSON);
+    }
+
+    @Test
     void orderDomainRestaurantTest() throws JsonProcessingException {
 
         var orderItems = List.of(
-                new OrderLineItem("Pizza", 2, new BigDecimal("12.00")),
-                new OrderLineItem("Coffee", 1, new BigDecimal("3.00"))
+                new OrderLineItemRecord("Pizza", 2, new BigDecimal("12.00")),
+                new OrderLineItemRecord("Coffee", 1, new BigDecimal("3.00"))
         );
 
-        var order = new Order(12345, "store_1234",
+        var order = new OrderRecord(12345, "store_1234",
                 new BigDecimal("15.00"),
                 OrderType.RESTAURANT,
                 orderItems,
