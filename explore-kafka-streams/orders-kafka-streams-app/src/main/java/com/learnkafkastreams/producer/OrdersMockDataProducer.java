@@ -42,7 +42,7 @@ public class OrdersMockDataProducer {
         );
 
         var order2 = new Order(54321, "store_1234",
-                new BigDecimal("123.00"),
+                new BigDecimal("15.00"),
                 OrderType.RESTAURANT,
                 orderItemsRestaurant,
                 LocalDateTime.parse("2022-12-05T08:55:27")

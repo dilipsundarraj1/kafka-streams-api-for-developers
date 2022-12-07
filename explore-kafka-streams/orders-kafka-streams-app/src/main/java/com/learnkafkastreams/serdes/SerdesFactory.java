@@ -1,6 +1,7 @@
 package com.learnkafkastreams.serdes;
 
 import com.learnkafkastreams.domain.Order;
+import com.learnkafkastreams.domain.Revenue;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 
@@ -14,4 +15,9 @@ public class SerdesFactory {
         return  Serdes.serdeFrom(jsonSerializer, jsonDeSerializer);
     }
 
+    public static Serde<Revenue> revenueSerdes() {
+        JsonSerializer<Revenue> jsonSerializer = new JsonSerializer<>();
+        JsonDeserializer<Revenue> jsonDeSerializer = new JsonDeserializer<>(Revenue.class);
+        return  Serdes.serdeFrom(jsonSerializer, jsonDeSerializer);
+    }
 }
