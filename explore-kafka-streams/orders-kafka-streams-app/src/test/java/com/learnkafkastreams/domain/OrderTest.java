@@ -24,11 +24,11 @@ public class OrderTest {
     void orderDomainTest() throws JsonProcessingException {
 
         var orderItems = List.of(
-                new OrderLineItemRecord("Bananas", 2, new BigDecimal("2.00")),
-                new OrderLineItemRecord("Iphone Charger", 1, new BigDecimal("25.00"))
+                new OrderLineItem("Bananas", 2, new BigDecimal("2.00")),
+                new OrderLineItem("Iphone Charger", 1, new BigDecimal("25.00"))
         );
 
-        var order = new OrderRecord(12345, "store_1234",
+        var order = new Order(12345, "store_1234",
                 new BigDecimal("27.00"),
                 OrderType.GENERAL,
                 orderItems,
@@ -46,11 +46,11 @@ public class OrderTest {
     void orderRecordDomainTest() throws JsonProcessingException {
 
         var orderItems = List.of(
-                new OrderLineItemRecord("Bananas", 2, new BigDecimal("2.00")),
-                new OrderLineItemRecord("Iphone Charger", 1, new BigDecimal("25.00"))
+                new OrderLineItem("Bananas", 2, new BigDecimal("2.00")),
+                new OrderLineItem("Iphone Charger", 1, new BigDecimal("25.00"))
         );
 
-        var order = new OrderRecord(12345, "store_1234",
+        var order = new Order(12345, "store_1234",
                 new BigDecimal("27.00"),
                 OrderType.GENERAL,
                 orderItems,
@@ -68,11 +68,11 @@ public class OrderTest {
     void orderDomainRestaurantTest() throws JsonProcessingException {
 
         var orderItems = List.of(
-                new OrderLineItemRecord("Pizza", 2, new BigDecimal("12.00")),
-                new OrderLineItemRecord("Coffee", 1, new BigDecimal("3.00"))
+                new OrderLineItem("Pizza", 2, new BigDecimal("12.00")),
+                new OrderLineItem("Coffee", 1, new BigDecimal("3.00"))
         );
 
-        var order = new OrderRecord(12345, "store_1234",
+        var order = new Order(12345, "store_1234",
                 new BigDecimal("15.00"),
                 OrderType.RESTAURANT,
                 orderItems,

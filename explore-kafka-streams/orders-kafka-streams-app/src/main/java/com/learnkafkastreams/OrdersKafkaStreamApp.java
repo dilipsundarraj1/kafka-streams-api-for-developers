@@ -21,7 +21,7 @@ public class OrdersKafkaStreamApp {
 
 
         Properties config = new Properties();
-        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "greetings-app"); // consumer group
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "orders-app"); // consumer group
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // read only the new messages
         //createTopics(config, List.of(GREETINGS, GREETINGS_UPPERCASE, GREETINGS_SPANISH));
