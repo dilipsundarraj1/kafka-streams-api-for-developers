@@ -20,24 +20,11 @@ public class GreetingsTopology {
 
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
-//        var greetingsStream = streamsBuilder.stream(GREETINGS,
-//                Consumed.with(Serdes.String(), Serdes.String()));//gm-googmorning
-//        greetingsStream
-//                .print(Printed.<String, String>toSysOut().withLabel("greeting"));
-//
-//        var greetingsSpanishStream = streamsBuilder.stream(GREETINGS_SPANISH,
-//                Consumed.with(Serdes.String(), Serdes.String())); // gm-goodmorningspanish
-//
-//        greetingsSpanishStream
-//                .print(Printed.<String, String>toSysOut().withLabel("greeting"));
-//
-//        greetingsStream
-//                .print(Printed.<String, String>toSysOut().withLabel("greeting"));
-//        KStream<String, String> mergedStream =  greetingsStream.merge(greetingsSpanishStream);
 //        KStream<String, String> mergedStream = getStringGreetingKStream(streamsBuilder);
 
         KStream<String, Greeting> mergedStream = getCustomGreetingKStream(streamsBuilder);
 
+        
 
         //var upperCaseStream = greetingsStream
         var upperCaseStream =mergedStream
@@ -104,8 +91,9 @@ public class GreetingsTopology {
     }
 
     private static KStream<String, String> getStringGreetingKStream(StreamsBuilder streamsBuilder) {
-        var greetingsStream = streamsBuilder.stream(GREETINGS,
-                Consumed.with(Serdes.String(), Serdes.String()));//gm-googmorning
+        KStream<String, String> greetingsStream = streamsBuilder.stream(GREETINGS,
+                Consumed.with(Serdes.String(), Serdes.String()));
+        //gm-googmorning
         greetingsStream
                 .print(Printed.<String, String>toSysOut().withLabel("greeting"));
 
