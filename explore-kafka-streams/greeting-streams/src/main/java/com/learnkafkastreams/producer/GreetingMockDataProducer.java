@@ -16,7 +16,7 @@ import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
 @Slf4j
 public class GreetingMockDataProducer {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
