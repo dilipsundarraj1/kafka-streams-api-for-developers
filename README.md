@@ -73,6 +73,12 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-upper
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic restaurant_orders --from-beginning
 ```
 
+### KTable
+
+```
+./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic general_orders --from-beginning
+```
+
 ### List Topics
 
 ```
