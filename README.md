@@ -61,10 +61,22 @@ kafka-console-producer --broker-list localhost:9092 --topic greetings
 ```
 docker exec -it broker bash
 ```
-- Command to produce messages in to the Kafka topic.
+- Command to consumer messages from the Kafka topic.
 
 ```
 kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-uppercase
+```
+
+- General_Orders Consumer
+
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic general_orders --from-beginning
+```
+
+- restaurant_orders Consumer
+
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic restaurant_orders --from-beginning
 ```
 
 ```
@@ -73,13 +85,11 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-upper
 ./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic restaurant_orders --from-beginning
 ```
 
-### KTable
-
-```
-./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic general_orders --from-beginning
-```
-
 ### List Topics
+
+```
+kafka-topics --bootstrap-server localhost:9092 --list
+```
 
 ```
 ./kafka-topics.sh --bootstrap-server localhost:9092 --list
