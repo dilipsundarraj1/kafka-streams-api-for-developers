@@ -21,12 +21,18 @@ public class GreetingMockDataProducer {
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        var greetings = List.of(
+        englishGreetings(objectMapper);
+        spanishGreetings(objectMapper);
+
+    }
+
+    private static void spanishGreetings(ObjectMapper objectMapper) {
+        var spanishGreetings = List.of(
                 new Greeting("Hello, Good Morning!", LocalDateTime.now()),
                 new Greeting("Hello, Good Evening!", LocalDateTime.now()),
                 new Greeting("Hello, Good Night!", LocalDateTime.now())
         );
-        greetings
+        spanishGreetings
                 .forEach(greeting -> {
                     try {
                         var greetingJSON = objectMapper.writeValueAsString(greeting);
@@ -36,7 +42,25 @@ public class GreetingMockDataProducer {
                         throw new RuntimeException(e);
                     }
                 });
+    }
 
+    private static void englishGreetings(ObjectMapper objectMapper) {
+        var spanishGreetings = List.of(
+                new Greeting("¡Hola buenos dias!", LocalDateTime.now()),
+                new Greeting("¡Hola buenas tardes!", LocalDateTime.now()),
+                new Greeting("¡Hola, buenas noches!", LocalDateTime.now())
+        );
+        spanishGreetings
+                .forEach(greeting -> {
+                    try {
+                        var greetingJSON = objectMapper.writeValueAsString(greeting);
+                        var recordMetaData = publishMessageSync(GreetingsTopology.GREETINGS, null, greetingJSON);
+                        log.info("Published the alphabet message : {} ", recordMetaData);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
 }
+

@@ -18,18 +18,27 @@ public class ExploreKTableTopology {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
 
-        var wordsStream = streamsBuilder
+        var wordsTable = streamsBuilder
                 .table("words", Consumed.with(Serdes.String(), Serdes.String())
                   , Materialized.as("words-store")
                 );
 
 
-        wordsStream
+
+        var wordsGlobalTable = streamsBuilder
+                .globalTable("words", Consumed.with(Serdes.String(), Serdes.String())
+                        , Materialized.as("words-global-store")
+                );
+
+
+
+
+        wordsTable
                 .toStream()
                 .peek(((key, value) -> log.info("Key : {} , value : {} ", key,value)))
                 .print(Printed.<String,String>toSysOut().withLabel("words-ktable"));
 
-        wordsStream
+        wordsTable
                 .filter((key, value) -> value.length()>3)
                 .toStream()
                 .print(Printed.<String,String>toSysOut().withLabel("words-ktable-filtered"));
