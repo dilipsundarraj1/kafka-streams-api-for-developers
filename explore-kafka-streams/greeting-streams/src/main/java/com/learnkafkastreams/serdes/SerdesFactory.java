@@ -3,6 +3,7 @@ package com.learnkafkastreams.serdes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.learnkafkastreams.domain.AlphabetWordAggregate;
 import com.learnkafkastreams.domain.Greeting;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -24,5 +25,13 @@ public class SerdesFactory {
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         return  Serdes.serdeFrom(new GreetingSerializer(objectMapper), new GreetingDeserializer(objectMapper));
+    }
+
+    public static Serde<AlphabetWordAggregate> alphabetWordAggregate() {
+
+        JsonSerializer<AlphabetWordAggregate> jsonSerializer = new JsonSerializer<>();
+
+        JsonDeserializer<AlphabetWordAggregate> jsonDeSerializer = new JsonDeserializer<>(AlphabetWordAggregate.class);
+        return  Serdes.serdeFrom(jsonSerializer, jsonDeSerializer);
     }
 }
