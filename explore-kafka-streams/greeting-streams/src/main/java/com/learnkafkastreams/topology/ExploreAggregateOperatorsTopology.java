@@ -11,10 +11,8 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.state.KeyValueStore;
 
-import java.util.HashSet;
-
 @Slf4j
-public class ExploreStatefulOperatorsTopology {
+public class ExploreAggregateOperatorsTopology {
 
 
     public static String AGGREGATE = "aggregate";

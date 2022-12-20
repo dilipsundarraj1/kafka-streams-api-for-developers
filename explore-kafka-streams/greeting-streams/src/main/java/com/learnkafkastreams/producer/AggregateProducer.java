@@ -3,7 +3,7 @@ package com.learnkafkastreams.producer;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
-import static com.learnkafkastreams.topology.ExploreStatefulOperatorsTopology.AGGREGATE;
+import static com.learnkafkastreams.topology.ExploreAggregateOperatorsTopology.AGGREGATE;
 
 @Slf4j
 public class AggregateProducer {

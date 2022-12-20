@@ -1,6 +1,7 @@
 package com.learnkafkastreams.launcher;
 
 import com.learnkafkastreams.topology.ExploreAggregateOperatorsTopology;
+import com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -14,24 +15,26 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static com.learnkafkastreams.topology.ExploreAggregateOperatorsTopology.AGGREGATE;
+import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS;
+import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS_ABBREVATIONS;
 import static org.apache.kafka.streams.StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG;
 
 @Slf4j
-public class AggregatingStreamPlayGroundApp {
+public class JoiningStreamPlayGroundApp {
 
 
     public static void main(String[] args) {
 
-      var kTableTopology = ExploreAggregateOperatorsTopology.build();
+      var kTableTopology = ExploreJoinsOperatorsTopology.build();
 
         Properties config = new Properties();
-        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "stateful-operation"); // consumer group
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "joins1"); // consumer group
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         config.put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
 
-        createTopics(config, List.of(AGGREGATE));
+        createTopics(config, List.of(ALPHABETS,ALPHABETS_ABBREVATIONS ));
          var kafkaStreams = new KafkaStreams(kTableTopology, config);
 
        // Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
