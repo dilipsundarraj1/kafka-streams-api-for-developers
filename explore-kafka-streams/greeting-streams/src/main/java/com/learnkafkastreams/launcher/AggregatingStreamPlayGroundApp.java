@@ -17,7 +17,7 @@ import static com.learnkafkastreams.topology.ExploreStatefulOperatorsTopology.AG
 import static org.apache.kafka.streams.StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG;
 
 @Slf4j
-public class AggregatingStreamPlayGroungApp {
+public class AggregatingStreamPlayGroundApp {
 
 
     public static void main(String[] args) {

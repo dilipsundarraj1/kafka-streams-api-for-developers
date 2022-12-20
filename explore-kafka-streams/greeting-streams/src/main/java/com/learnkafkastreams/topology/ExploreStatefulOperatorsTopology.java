@@ -5,6 +5,7 @@ import com.learnkafkastreams.serdes.SerdesFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.*;
@@ -29,6 +30,8 @@ public class ExploreStatefulOperatorsTopology {
                 .print(Printed.<String,String>toSysOut().withLabel("words"));
 
         var groupedString = wordsTable
+                //.selectKey((key, value) -> String.valueOf(value.charAt(0)))// Apple -> A, Ambulance -> A
+                .map((key, value) -> KeyValue.pair(String.valueOf(value.charAt(0)), value))
                 .groupByKey(Grouped.with(Serdes.String(), Serdes.String()));
 
         //exploreCount(groupedString);
