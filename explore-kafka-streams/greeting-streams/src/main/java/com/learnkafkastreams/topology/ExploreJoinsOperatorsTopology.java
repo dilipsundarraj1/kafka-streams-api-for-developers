@@ -33,7 +33,7 @@ public class ExploreJoinsOperatorsTopology {
         return streamsBuilder.build();
     }
 
-    private static void joinKStreams(StreamsBuilder streamsBuilder) {
+    private static void joinKStreams1(StreamsBuilder streamsBuilder) {
         var alphabetsAbbreviation = streamsBuilder
                 .stream(ALPHABETS_ABBREVATIONS, Consumed.with(Serdes.String(), Serdes.String()));
 
@@ -49,14 +49,52 @@ public class ExploreJoinsOperatorsTopology {
                 .print(Printed.<String, String>toSysOut().withLabel("alphabets"));
 
         JoinWindows fiveSecondWindow =  JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5));
+
         ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
 
         var joinedParams =
                 StreamJoined.with(Serdes.String(), Serdes.String(), SerdesFactory.alphabetWordAggregate());
 
         var joinedStream = alphabetsAbbreviation
-                .join(alphabetsStream, valueJoiner, fiveSecondWindow
-                //        ,joinedParams
+                .join(alphabetsStream,
+                        valueJoiner,
+                        fiveSecondWindow
+                        //,joinedParams
+                );
+
+        joinedStream
+                .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
+    }
+
+
+    private static void joinKStreams(StreamsBuilder streamsBuilder) {
+
+        var alphabetsAbbreviation = streamsBuilder
+                .stream(ALPHABETS_ABBREVATIONS, Consumed.with(Serdes.String(), Serdes.String()));
+
+        alphabetsAbbreviation
+                .print(Printed.<String, String>toSysOut().withLabel("alphabets-abbreviations"));
+
+        var alphabetsStream = streamsBuilder
+                .stream(ALPHABETS,
+                        Consumed.with(Serdes.String(), Serdes.String())
+                );
+
+        alphabetsStream
+                .print(Printed.<String, String>toSysOut().withLabel("alphabets"));
+
+        var joinedParams =
+                StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String());
+
+        JoinWindows tenSecondWindow =  JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5));
+
+        ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
+
+        var joinedStream = alphabetsAbbreviation
+                .join(alphabetsStream,
+                        valueJoiner,
+                        tenSecondWindow
+                        , joinedParams
                 );
 
         joinedStream

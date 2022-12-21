@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import static com.learnkafkastreams.topology.ExploreAggregateOperatorsTopology.AGGREGATE;
 import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS;
 import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS_ABBREVATIONS;
+import static org.apache.kafka.streams.StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG;
 import static org.apache.kafka.streams.StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG;
 
 @Slf4j
@@ -32,7 +33,8 @@ public class JoiningStreamPlayGroundApp {
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         config.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, "5000");
-        config.put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        //config.put(DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        //config.put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
 
         createTopics(config, List.of(ALPHABETS,ALPHABETS_ABBREVATIONS ));

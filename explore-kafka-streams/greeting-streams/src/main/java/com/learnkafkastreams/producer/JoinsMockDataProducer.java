@@ -8,6 +8,7 @@ import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
 import static com.learnkafkastreams.topology.ExploreAggregateOperatorsTopology.AGGREGATE;
 import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS;
 import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS_ABBREVATIONS;
+import static java.lang.Thread.sleep;
 
 @Slf4j
 public class JoinsMockDataProducer {
@@ -24,6 +25,8 @@ public class JoinsMockDataProducer {
 //                "B", "B is the Second letter in English Alphabets."
         );
         publishMessages(alphabetMap, ALPHABETS);
+
+       // sleep(6000);
 
         var alphabetAbbrevationMap = Map.of(
                 "A", "Apple",
