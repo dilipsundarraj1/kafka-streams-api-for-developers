@@ -12,6 +12,8 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.state.KeyValueStore;
 
+import java.time.Duration;
+
 @Slf4j
 public class ExploreJoinsOperatorsTopology {
 
@@ -19,14 +21,46 @@ public class ExploreJoinsOperatorsTopology {
     public static String ALPHABETS = "alphabets"; // A => First letter in the english alphabet
     public static String ALPHABETS_ABBREVATIONS = "alphabets_abbreviations"; // A=> Apple
 
+
     public static Topology build(){
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
-        join(streamsBuilder);
+        //joinKStreamWithKTable(streamsBuilder);
       //  joinKTables(streamsBuilder);
+        joinKStreams(streamsBuilder);
 
 
         return streamsBuilder.build();
+    }
+
+    private static void joinKStreams(StreamsBuilder streamsBuilder) {
+        var alphabetsAbbreviation = streamsBuilder
+                .stream(ALPHABETS_ABBREVATIONS, Consumed.with(Serdes.String(), Serdes.String()));
+
+        alphabetsAbbreviation
+                .print(Printed.<String, String>toSysOut().withLabel("alphabets-abbreviations"));
+
+        var alphabetsStream = streamsBuilder
+                .stream(ALPHABETS,
+                        Consumed.with(Serdes.String(), Serdes.String())
+                       );
+
+        alphabetsStream
+                .print(Printed.<String, String>toSysOut().withLabel("alphabets"));
+
+        JoinWindows fiveSecondWindow =  JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5));
+        ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
+
+        var joinedParams =
+                StreamJoined.with(Serdes.String(), Serdes.String(), SerdesFactory.alphabetWordAggregate());
+
+        var joinedStream = alphabetsAbbreviation
+                .join(alphabetsStream, valueJoiner, fiveSecondWindow
+                //        ,joinedParams
+                );
+
+        joinedStream
+                .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
     }
 
     private static void joinKTables(StreamsBuilder streamsBuilder) {
@@ -61,7 +95,7 @@ public class ExploreJoinsOperatorsTopology {
     }
 
 
-    private static void join(StreamsBuilder streamsBuilder) {
+    private static void joinKStreamWithKTable(StreamsBuilder streamsBuilder) {
 
         var alphabetsAbbreviation = streamsBuilder
                 .stream(ALPHABETS_ABBREVATIONS, Consumed.with(Serdes.String(), Serdes.String()));

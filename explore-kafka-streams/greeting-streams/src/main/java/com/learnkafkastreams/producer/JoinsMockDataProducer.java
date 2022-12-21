@@ -30,7 +30,7 @@ public class JoinsMockDataProducer {
                 "B", "Bus."
 
         );
-      //  publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
+       publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
 
         alphabetAbbrevationMap = Map.of(
                 "A", "Airplane",
