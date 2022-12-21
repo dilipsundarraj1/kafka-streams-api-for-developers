@@ -17,26 +17,27 @@ public class JoinsMockDataProducer {
 
 
         var alphabetMap = Map.of(
-//                "A", "A is the first letter in English Alphabets.",
-//                "B", "B is the second letter in English Alphabets.",
-                "A", "A is the First letter in English Alphabets.",
-                "B", "B is the Second letter in English Alphabets."
+                "A", "A is the first letter in English Alphabets.",
+                "B", "B is the second letter in English Alphabets."
+//                ,
+//                "A", "A is the First letter in English Alphabets.",
+//                "B", "B is the Second letter in English Alphabets."
         );
-        //publishMessages(alphabetMap, ALPHABETS);
+        publishMessages(alphabetMap, ALPHABETS);
 
         var alphabetAbbrevationMap = Map.of(
                 "A", "Apple",
                 "B", "Bus."
 
         );
-        publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
+      //  publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
 
         alphabetAbbrevationMap = Map.of(
                 "A", "Airplane",
                 "B", "Baby."
 
         );
-        //publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
+       // publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
 
     }
 
