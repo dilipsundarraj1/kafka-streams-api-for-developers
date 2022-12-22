@@ -26,44 +26,11 @@ public class ExploreJoinsOperatorsTopology {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
         //joinKStreamWithKTable(streamsBuilder);
-      //  joinKTables(streamsBuilder);
-        joinKStreams(streamsBuilder);
+       // joinKTables(streamsBuilder);
+       joinKStreams(streamsBuilder);
 
 
         return streamsBuilder.build();
-    }
-
-    private static void joinKStreams1(StreamsBuilder streamsBuilder) {
-        var alphabetsAbbreviation = streamsBuilder
-                .stream(ALPHABETS_ABBREVATIONS, Consumed.with(Serdes.String(), Serdes.String()));
-
-        alphabetsAbbreviation
-                .print(Printed.<String, String>toSysOut().withLabel("alphabets-abbreviations"));
-
-        var alphabetsStream = streamsBuilder
-                .stream(ALPHABETS,
-                        Consumed.with(Serdes.String(), Serdes.String())
-                       );
-
-        alphabetsStream
-                .print(Printed.<String, String>toSysOut().withLabel("alphabets"));
-
-        JoinWindows fiveSecondWindow =  JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5));
-
-        ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
-
-        var joinedParams =
-                StreamJoined.with(Serdes.String(), Serdes.String(), SerdesFactory.alphabetWordAggregate());
-
-        var joinedStream = alphabetsAbbreviation
-                .join(alphabetsStream,
-                        valueJoiner,
-                        fiveSecondWindow
-                        //,joinedParams
-                );
-
-        joinedStream
-                .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
     }
 
 
@@ -90,8 +57,28 @@ public class ExploreJoinsOperatorsTopology {
 
         ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
 
+//        var joinedStream = alphabetsAbbreviation
+//                .join(alphabetsStream,
+//                        valueJoiner,
+//                        tenSecondWindow
+//                        , joinedParams
+//                );
+
+    /* leftJoin:
+             If there is an event for the alphabetsAbbreviation stream , the join will be triggered even if there is no event in the alphabetsStream.
+             The joinedValue will have null for the description.*/
+/*
         var joinedStream = alphabetsAbbreviation
-                .join(alphabetsStream,
+                .leftJoin(alphabetsStream,
+                        valueJoiner,
+                        tenSecondWindow
+                        , joinedParams
+                );
+*/
+
+    /* outerJoin:*/
+                var joinedStream = alphabetsAbbreviation
+                .outerJoin(alphabetsStream,
                         valueJoiner,
                         tenSecondWindow
                         , joinedParams
@@ -123,14 +110,19 @@ public class ExploreJoinsOperatorsTopology {
         ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
 
 
+//        var joinedTable = alphabetsAbbreviation
+//                .join(alphabetsTable,
+//                        valueJoiner);
+
         var joinedTable = alphabetsAbbreviation
-                .join(alphabetsTable,
+                .leftJoin(alphabetsTable,
                         valueJoiner);
 
         joinedTable
                 .toStream()
                 .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
     }
+
 
 
     private static void joinKStreamWithKTable(StreamsBuilder streamsBuilder) {
@@ -154,6 +146,31 @@ public class ExploreJoinsOperatorsTopology {
         var joinedStream = alphabetsAbbreviation
                 .join(alphabetsTable,
                         valueJoiner);
+
+        joinedStream
+                .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
+    }
+
+    private static void joinKStreamWithGlobalKTable(StreamsBuilder streamsBuilder) {
+
+        var alphabetsAbbreviation = streamsBuilder
+                .stream(ALPHABETS_ABBREVATIONS, Consumed.with(Serdes.String(), Serdes.String()));
+
+        alphabetsAbbreviation
+                .print(Printed.<String, String>toSysOut().withLabel("alphabets-abbreviations"));
+
+        var alphabetsTable = streamsBuilder
+                .globalTable(ALPHABETS,
+                        Consumed.with(Serdes.String(), Serdes.String())
+                        , Materialized.as("alphabets-store"));
+
+        ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
+
+        KeyValueMapper<String, String, String> keyMapper =
+                (leftKey, rightKey) -> leftKey;
+
+        var joinedStream = alphabetsAbbreviation
+                .join(alphabetsTable,keyMapper,valueJoiner);
 
         joinedStream
                 .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
