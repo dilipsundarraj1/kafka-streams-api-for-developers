@@ -48,9 +48,25 @@ public class OrdersMockDataProducer {
                 LocalDateTime.parse("2022-12-05T08:55:27")
         );
 
+        var order3 = new Order(12345, "store_4567",
+                new BigDecimal("27.00"),
+                OrderType.GENERAL,
+                orderItems,
+                LocalDateTime.parse("2022-12-05T08:55:27")
+        );
+
+        var order4 = new Order(12345, "store_4567",
+                new BigDecimal("27.00"),
+                OrderType.RESTAURANT,
+                orderItems,
+                LocalDateTime.parse("2022-12-05T08:55:27")
+        );
+
         var orders = List.of(
                 order1,
-                order2
+                order2,
+                order3,
+                order4
         );
         orders
                 .forEach(order -> {
