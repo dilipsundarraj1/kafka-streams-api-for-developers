@@ -1,9 +1,6 @@
 package com.learnkafkastreams.topology;
 
-import com.learnkafkastreams.domain.Order;
-import com.learnkafkastreams.domain.OrderType;
-import com.learnkafkastreams.domain.Revenue;
-import com.learnkafkastreams.domain.TotalRevenue;
+import com.learnkafkastreams.domain.*;
 import com.learnkafkastreams.serdes.SerdesFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
@@ -23,6 +20,8 @@ public class OrdersTopology {
     public static final String GENERAL_ORDERS = "general_orders";
     public static final String RESTAURANT_ORDERS = "restaurant_orders";
 
+    public static final String STORES = "stores";
+
 
     public static Topology buildTopology() {
 
@@ -34,6 +33,14 @@ public class OrdersTopology {
 
         var orderStreams = streamsBuilder
                 .stream(ORDERS, Consumed.with(Serdes.String(), SerdesFactory.orderSerdes()));
+
+        var storesTable = streamsBuilder
+                .table(STORES,
+                        Consumed.with(Serdes.String(), SerdesFactory.storeSerdes()));
+
+        storesTable
+                .toStream()
+                        .print(Printed.<String,Store>toSysOut().withLabel("stores"));
 
         orderStreams
                 .print(Printed.<String, Order>toSysOut().withLabel("orders"));
@@ -54,7 +61,7 @@ public class OrdersTopology {
 //                                    );
 
                             aggregateOrdersByCount(generalOrdersStream, "general-orders-count");
-                            aggregateOrdersByRevenue(generalOrdersStream, "general-orders-revenue");
+                            aggregateOrdersByRevenue(generalOrdersStream, "general-orders-revenue", storesTable);
                         }))
                 .branch(restaurantPredicate,
                         Branched.withConsumer(restaurantOrdersStream -> {
@@ -66,7 +73,7 @@ public class OrdersTopology {
 //                                    );
 
                             aggregateOrdersByCount(restaurantOrdersStream, "restaurant-orders-count");
-                            aggregateOrdersByRevenue(restaurantOrdersStream, "restaurant-orders-revenue");
+                            aggregateOrdersByRevenue(restaurantOrdersStream, "restaurant-orders-revenue", storesTable);
                         }));
 
 
@@ -74,7 +81,7 @@ public class OrdersTopology {
         return streamsBuilder.build();
     }
 
-    private static void aggregateOrdersByRevenue(KStream<String, Order> generalOrdersStream, String aggregateStoreName) {
+    private static void aggregateOrdersByRevenue(KStream<String, Order> generalOrdersStream, String aggregateStoreName, KTable<String, Store> storesTable) {
 
 
         Initializer<TotalRevenue> alphabetWordAggregateInitializer = TotalRevenue::new;
@@ -83,7 +90,7 @@ public class OrdersTopology {
             return totalRevenue.updateRunningRevenue(key, order);
         };
 
-        var revenueStream = generalOrdersStream
+        var revenueTable = generalOrdersStream
                 .map((key, value) -> KeyValue.pair(value.locationId(), value))
                 .groupByKey(Grouped.with(Serdes.String(), SerdesFactory.orderSerdes()))
                 .aggregate(alphabetWordAggregateInitializer,
@@ -94,9 +101,19 @@ public class OrdersTopology {
                                 .withValueSerde(SerdesFactory.totalRevenueSerdes())
                         );
 
-        revenueStream
+        revenueTable
                 .toStream()
                 .print(Printed.<String,TotalRevenue>toSysOut().withLabel(aggregateStoreName));
+
+        ValueJoiner<TotalRevenue, Store, TotalRevenueWithAddress> valueJoiner = TotalRevenueWithAddress::new;
+
+        var revenueWithStoreTable = revenueTable
+                .join(storesTable,valueJoiner);
+
+        revenueWithStoreTable
+                .toStream()
+                .print(Printed.<String,TotalRevenueWithAddress>toSysOut().withLabel("total-revenue-withaddress-bystore"));
+
 
     }
 

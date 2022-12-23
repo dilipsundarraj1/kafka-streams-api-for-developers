@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static com.learnkafkastreams.topology.OrdersTopology.GENERAL_ORDERS;
-import static com.learnkafkastreams.topology.OrdersTopology.RESTAURANT_ORDERS;
+import static com.learnkafkastreams.topology.OrdersTopology.*;
 
 @Slf4j
 public class OrdersKafkaStreamApp {
@@ -29,7 +28,7 @@ public class OrdersKafkaStreamApp {
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "orders-app"); // consumer group
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // read only the new messages
-        createTopics(config, List.of(OrdersTopology.ORDERS, GENERAL_ORDERS, RESTAURANT_ORDERS));
+        createTopics(config, List.of(STORES, ORDERS, GENERAL_ORDERS, RESTAURANT_ORDERS));
 
         //Create an instance of KafkaStreams
         var kafkaStreams = new KafkaStreams(topology, config);
