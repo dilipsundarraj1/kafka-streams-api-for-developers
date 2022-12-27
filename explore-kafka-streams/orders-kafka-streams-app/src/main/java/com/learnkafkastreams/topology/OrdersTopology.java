@@ -108,11 +108,11 @@ public class OrdersTopology {
         ValueJoiner<TotalRevenue, Store, TotalRevenueWithAddress> valueJoiner = TotalRevenueWithAddress::new;
 
         var revenueWithStoreTable = revenueTable
-                .join(storesTable,valueJoiner);
+                .leftJoin(storesTable,valueJoiner);
 
         revenueWithStoreTable
                 .toStream()
-                .print(Printed.<String,TotalRevenueWithAddress>toSysOut().withLabel("total-revenue-withaddress-bystore"));
+                .print(Printed.<String,TotalRevenueWithAddress>toSysOut().withLabel(aggregateStoreName+"-bystore"));
 
 
     }

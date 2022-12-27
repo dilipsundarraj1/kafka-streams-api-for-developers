@@ -46,7 +46,7 @@ public class OrdersKafkaStreamApp {
     private static void createTopics(Properties config, List<String> greetings) {
 
         AdminClient admin = AdminClient.create(config);
-        var partitions = 1;
+        var partitions = 2;
         short replication  = 1;
 
         var newTopics = greetings
