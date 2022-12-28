@@ -85,9 +85,7 @@ public class OrdersMockDataProducer {
             sleep(1000);
             publishOrders(objectMapper, orders);
             count++;
-
         }
-
     }
 
     private static void publishOrders(ObjectMapper objectMapper, List<Order> orders) {
