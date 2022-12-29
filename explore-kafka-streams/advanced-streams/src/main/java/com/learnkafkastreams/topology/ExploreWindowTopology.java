@@ -42,7 +42,9 @@ public class ExploreWindowTopology {
                 .groupByKey()
                 .windowedBy(hoppingWindow)
                 .count()
-               // .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull()))
+                .suppress(Suppressed
+                        .untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull())
+                )
                 .toStream()
                 .peek(((key, value) -> {
                     log.info("tumblingWindow : key : {}, value : {}", key, value);
