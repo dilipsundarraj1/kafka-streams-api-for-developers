@@ -26,9 +26,9 @@ public class ExploreWindowTopology {
       //  wordsStream.print(Printed.<String,String>toSysOut().withLabel("words"));
 
 
-        tumblingWindow(wordsStream);
+        //tumblingWindow(wordsStream);
         //hoppingWindow(wordsStream);
-       // slidingWindow(wordsStream);
+       slidingWindow(wordsStream);
 
         return streamsBuilder.build();
     }
@@ -50,9 +50,6 @@ public class ExploreWindowTopology {
                     log.info("tumblingWindow : key : {}, value : {}", key, value);
                     printLocalDateTimes(key, value);
                 }))
-//                .map(
-//
-//                )
                 .print(Printed.<Windowed<String>, Long>toSysOut().withLabel("tumblingWindow"));
         ;
 
@@ -69,6 +66,10 @@ public class ExploreWindowTopology {
                 .count()
                 .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull()))
                 .toStream()
+                .peek(((key, value) -> {
+                    log.info("slidingWindow : key : {}, value : {}", key, value);
+                    printLocalDateTimes(key, value);
+                }))
                 .print(Printed.<Windowed<String>, Long>toSysOut().withLabel("slidingWindow"));
 
     }

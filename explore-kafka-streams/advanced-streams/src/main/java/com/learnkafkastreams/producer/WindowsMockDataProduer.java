@@ -13,6 +13,12 @@ public class WindowsMockDataProduer {
 
     public static void main(String[] args) throws InterruptedException {
 
+        //bulkMockDataProducer();
+        bulkMockDataProducer_SlidingWindows();
+
+    }
+
+    private static void bulkMockDataProducer() throws InterruptedException {
         var key = "A";
         var word = "Apple";
         int count = 0;
@@ -22,9 +28,19 @@ public class WindowsMockDataProduer {
             sleep(1000);
             count++;
         }
-
     }
 
+    private static void bulkMockDataProducer_SlidingWindows() throws InterruptedException {
+        var key = "A";
+        var word = "Apple";
+        int count = 0;
+        while(count<10){
+            var recordMetaData = publishMessageSync(WINDOW_WORDS, key,word);
+            log.info("Published the alphabet message : {} ", recordMetaData);
+            sleep(1000);
+            count++;
+        }
+    }
 
 
 }
