@@ -4,12 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.learnkafkastreams.domain.*;
+import com.learnkafkastreams.domain.Address;
+import com.learnkafkastreams.domain.Store;
 import com.learnkafkastreams.topology.OrdersTopology;
 import lombok.extern.slf4j.Slf4j;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
@@ -27,7 +26,7 @@ public class StoresMockDataProducer {
         var store1 = new Store("store_1234",
                 address1,
                 "1234567890"
-                );
+        );
 
         var address2 = new Address("1234 Street 2 ", "", "City2", "State2", "541321");
         var store2 = new Store("store_4567",

@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
+import static java.lang.Thread.sleep;
 
 @Slf4j
 public class OrdersMockDataProducer {
@@ -23,7 +24,12 @@ public class OrdersMockDataProducer {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        //publishOrders(objectMapper, buildOrders());
+        publishBulkOrders(objectMapper);
 
+    }
+
+    private static List<Order> buildOrders() {
         var orderItems = List.of(
                 new OrderLineItem("Bananas", 2, new BigDecimal("2.00")),
                 new OrderLineItem("Iphone Charger", 1, new BigDecimal("25.00"))
@@ -38,41 +44,56 @@ public class OrdersMockDataProducer {
                 new BigDecimal("27.00"),
                 OrderType.GENERAL,
                 orderItems,
-                LocalDateTime.parse("2022-12-05T08:55:27")
+                LocalDateTime.now()
         );
 
         var order2 = new Order(54321, "store_1234",
                 new BigDecimal("15.00"),
                 OrderType.RESTAURANT,
                 orderItemsRestaurant,
-                LocalDateTime.parse("2022-12-05T08:55:27")
+                LocalDateTime.now()
         );
 
         var order3 = new Order(12345, "store_4567",
                 new BigDecimal("27.00"),
                 OrderType.GENERAL,
                 orderItems,
-                LocalDateTime.parse("2022-12-05T08:55:27")
+                LocalDateTime.now()
         );
 
         var order4 = new Order(12345, "store_4567",
                 new BigDecimal("27.00"),
                 OrderType.RESTAURANT,
                 orderItems,
-                LocalDateTime.parse("2022-12-05T08:55:27")
+                LocalDateTime.now()
         );
 
-        var orders = List.of(
+        return List.of(
                 order1,
                 order2,
                 order3,
                 order4
         );
+    }
+
+    private static void publishBulkOrders(ObjectMapper objectMapper) throws InterruptedException {
+
+        int count = 0;
+        while(count < 100){
+            var orders = buildOrders();
+            publishOrders(objectMapper, orders);
+            sleep(1000);
+            count++;
+        }
+    }
+
+    private static void publishOrders(ObjectMapper objectMapper, List<Order> orders) {
+
         orders
                 .forEach(order -> {
                     try {
-                        var greetingJSON = objectMapper.writeValueAsString(order);
-                        var recordMetaData = publishMessageSync(OrdersTopology.ORDERS, order.orderId()+"", greetingJSON);
+                        var ordersJSON = objectMapper.writeValueAsString(order);
+                        var recordMetaData = publishMessageSync(OrdersTopology.ORDERS, order.orderId()+"", ordersJSON);
                         log.info("Published the order message : {} ", recordMetaData);
                     } catch (JsonProcessingException e) {
                         log.error("JsonProcessingException : {} ", e.getMessage(), e);
@@ -83,7 +104,6 @@ public class OrdersMockDataProducer {
                         throw new RuntimeException(e);
                     }
                 });
-
     }
 
 }
