@@ -25,6 +25,7 @@ public class SerdesFactory {
         return  Serdes.serdeFrom(jsonSerializer, jsonDeSerializer);
     }
 
+
     public static Serde<Revenue> revenueSerdes() {
         JsonSerializer<Revenue> jsonSerializer = new JsonSerializer<>();
         JsonDeserializer<Revenue> jsonDeSerializer = new JsonDeserializer<>(Revenue.class);

@@ -24,8 +24,8 @@ public class OrdersMockDataProducer {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        publishOrders(objectMapper, buildOrders());
-       // publishBulkOrders(objectMapper, orders);
+        //publishOrders(objectMapper, buildOrders());
+       publishBulkOrders(objectMapper);
 
     }
 
@@ -68,13 +68,12 @@ public class OrdersMockDataProducer {
                 LocalDateTime.now()
         );
 
-        var orders = List.of(
+        return List.of(
                 order1,
                 order2,
                 order3,
                 order4
         );
-        return orders;
     }
 
     private static void publishBulkOrders(ObjectMapper objectMapper) throws InterruptedException {
@@ -82,8 +81,8 @@ public class OrdersMockDataProducer {
         int count = 0;
         while(count < 100){
             var orders = buildOrders();
-            sleep(1000);
             publishOrders(objectMapper, orders);
+            sleep(1000);
             count++;
         }
     }

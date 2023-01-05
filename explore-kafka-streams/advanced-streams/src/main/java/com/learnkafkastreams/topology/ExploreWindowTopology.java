@@ -26,17 +26,20 @@ public class ExploreWindowTopology {
       //  wordsStream.print(Printed.<String,String>toSysOut().withLabel("words"));
 
 
-        //tumblingWindow(wordsStream);
+        tumblingWindow(wordsStream);
         //hoppingWindow(wordsStream);
-       slidingWindow(wordsStream);
+       //slidingWindow(wordsStream);
 
         return streamsBuilder.build();
     }
 
     private static void tumblingWindow(KStream<String, String> wordsStream) {
         Duration windowSize = Duration.ofSeconds(30);
+        Duration graceWindowsSize = Duration.ofSeconds(5);
 
-        TimeWindows hoppingWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
+//        TimeWindows hoppingWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
+
+        TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
 
         wordsStream
                 .groupByKey()
