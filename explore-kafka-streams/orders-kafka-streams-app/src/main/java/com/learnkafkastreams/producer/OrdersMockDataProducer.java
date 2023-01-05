@@ -11,7 +11,10 @@ import com.learnkafkastreams.topology.OrdersTopology;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
@@ -24,8 +27,23 @@ public class OrdersMockDataProducer {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        //publishOrders(objectMapper, buildOrders());
-       publishBulkOrders(objectMapper);
+        publishOrders(objectMapper, buildOrders());
+        //publishBulkOrders(objectMapper);
+        System.out.println(LocalDateTime.now(ZoneId.of("UTC")));
+        System.out.println(LocalDateTime.now());
+
+        var timeStamp = LocalDateTime.now();
+        //var timeStamp = LocalDateTime.now(ZoneId.of("UTC"));
+
+
+        System.out.println(ZoneOffset.getAvailableZoneIds());
+
+        var instant = timeStamp.toEpochSecond(ZoneOffset.ofHours(-6));
+
+//
+        System.out.println("instant : " + instant);
+        //System.out.println("toEpochMilli : " + instant.toEpochMilli());
+
 
     }
 
@@ -45,6 +63,7 @@ public class OrdersMockDataProducer {
                 OrderType.GENERAL,
                 orderItems,
                 LocalDateTime.now()
+                //LocalDateTime.now(ZoneId.of("UTC"))
         );
 
         var order2 = new Order(54321, "store_1234",
@@ -52,6 +71,7 @@ public class OrdersMockDataProducer {
                 OrderType.RESTAURANT,
                 orderItemsRestaurant,
                 LocalDateTime.now()
+                //LocalDateTime.now(ZoneId.of("UTC"))
         );
 
         var order3 = new Order(12345, "store_4567",
@@ -59,6 +79,7 @@ public class OrdersMockDataProducer {
                 OrderType.GENERAL,
                 orderItems,
                 LocalDateTime.now()
+                //LocalDateTime.now(ZoneId.of("UTC"))
         );
 
         var order4 = new Order(12345, "store_4567",
@@ -66,6 +87,7 @@ public class OrdersMockDataProducer {
                 OrderType.RESTAURANT,
                 orderItems,
                 LocalDateTime.now()
+                //LocalDateTime.now(ZoneId.of("UTC"))
         );
 
         return List.of(
@@ -79,7 +101,7 @@ public class OrdersMockDataProducer {
     private static void publishBulkOrders(ObjectMapper objectMapper) throws InterruptedException {
 
         int count = 0;
-        while(count < 100){
+        while (count < 100) {
             var orders = buildOrders();
             publishOrders(objectMapper, orders);
             sleep(1000);
@@ -93,13 +115,12 @@ public class OrdersMockDataProducer {
                 .forEach(order -> {
                     try {
                         var ordersJSON = objectMapper.writeValueAsString(order);
-                        var recordMetaData = publishMessageSync(OrdersTopology.ORDERS, order.orderId()+"", ordersJSON);
+                        var recordMetaData = publishMessageSync(OrdersTopology.ORDERS, order.orderId() + "", ordersJSON);
                         log.info("Published the order message : {} ", recordMetaData);
                     } catch (JsonProcessingException e) {
                         log.error("JsonProcessingException : {} ", e.getMessage(), e);
                         throw new RuntimeException(e);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         log.error("Exception : {} ", e.getMessage(), e);
                         throw new RuntimeException(e);
                     }

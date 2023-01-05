@@ -2,6 +2,7 @@ package com.learnkafkastreams.topology;
 
 import com.learnkafkastreams.domain.*;
 import com.learnkafkastreams.serdes.SerdesFactory;
+import com.learnkafkastreams.util.OrderTimeStampExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -50,6 +51,7 @@ public class OrdersTopology {
         var orderStreams = streamsBuilder
                 .stream(ORDERS,
                         Consumed.with(Serdes.String(), SerdesFactory.orderSerdes())
+                        .withTimestampExtractor(new OrderTimeStampExtractor())
                 );
 
         var storesTable = streamsBuilder
@@ -226,7 +228,7 @@ public class OrdersTopology {
     private static void printLocalDateTimes(Windowed<String> key, Object value) {
         var startTime = key.window().startTime();
         var endTime = key.window().endTime();
-
+        log.info("startTime : {} , endTime : {}, Count : {}", startTime, endTime, value);
         LocalDateTime startLDT = LocalDateTime.ofInstant(startTime, ZoneId.of(ZoneId.SHORT_IDS.get("CST")));
         LocalDateTime endLDT = LocalDateTime.ofInstant(endTime, ZoneId.of(ZoneId.SHORT_IDS.get("CST")));
         log.info("startLDT : {} , endLDT : {}, Count : {}", startLDT, endLDT, value);
