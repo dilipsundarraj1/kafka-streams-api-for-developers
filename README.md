@@ -74,6 +74,14 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-upper
 
 ### List Topics
 
+- This  command should take care of logging in to the Kafka container.
+
 ```
-./kafka-topics.sh --bootstrap-server localhost:9092 --list
+docker exec -it broker bash
+```
+
+- Command to list the topics.
+
+```
+kafka-topics --bootstrap-server localhost:9092 --list
 ```
