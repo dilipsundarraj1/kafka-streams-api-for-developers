@@ -44,14 +44,14 @@ kafka-console-producer --broker-list localhost:9092 --topic greetings
 - Publish to **greetings** topic
 
 ```
-kafka-console-producer.sh --broker-list localhost:9092 --topic greetings --property "key.separator=-" --property "parse.key=true"
+kafka-console-producer --broker-list localhost:9092 --topic greetings --property "key.separator=-" --property "parse.key=true"
 
 ```
 
 - Publish to **greetings-spanish** topic
 
 ```
- kafka-console-producer.sh --broker-list localhost:9092 --topic greetings-spanish --property "key.separator=-" --property "parse.key=true"
+ kafka-console-producer --broker-list localhost:9092 --topic greetings-spanish --property "key.separator=-" --property "parse.key=true"
 ```
 
 #### Consume Messages
@@ -68,7 +68,7 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-upper
 ```
 
 ```
-kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic greetings-uppercase --from-beginning
+kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-uppercase --from-beginning
 
 ```
 
