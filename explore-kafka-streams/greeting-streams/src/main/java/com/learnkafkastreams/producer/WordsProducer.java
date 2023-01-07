@@ -3,11 +3,11 @@ package com.learnkafkastreams.producer;
 import lombok.extern.slf4j.Slf4j;
 
 import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
-import static com.learnkafkastreams.topology.ExploreKTableTopology.WORDS;
 
 @Slf4j
 public class WordsProducer {
 
+    static String WORDS = "words";
 
     public static void main(String[] args) throws InterruptedException {
 
