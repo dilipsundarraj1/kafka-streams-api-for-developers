@@ -41,14 +41,14 @@ docker exec -it broker bash
 kafka-console-producer --broker-list localhost:9092 --topic greetings
 ```
 
-- Publish to **greetings** topic
+- Publish to **greetings** topic with key and value
 
 ```
 kafka-console-producer --broker-list localhost:9092 --topic greetings --property "key.separator=-" --property "parse.key=true"
 
 ```
 
-- Publish to **greetings-spanish** topic
+- Publish to **greetings-spanish** topic with key and value
 
 ```
  kafka-console-producer --broker-list localhost:9092 --topic greetings-spanish --property "key.separator=-" --property "parse.key=true"
