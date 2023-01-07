@@ -11,7 +11,6 @@ import com.learnkafkastreams.topology.OrdersTopology;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -27,23 +26,61 @@ public class OrdersMockDataProducer {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        publishOrders(objectMapper, buildOrders());
+       publishOrders(objectMapper, buildOrders());
         //publishBulkOrders(objectMapper);
+      //  publishOrdersForGracePeriod(objectMapper, buildOrders());
         System.out.println(LocalDateTime.now(ZoneId.of("UTC")));
         System.out.println(LocalDateTime.now());
 
         var timeStamp = LocalDateTime.now();
         //var timeStamp = LocalDateTime.now(ZoneId.of("UTC"));
-
-
-        System.out.println(ZoneOffset.getAvailableZoneIds());
+        System.out.println("timeStamp : " + timeStamp);
 
         var instant = timeStamp.toEpochSecond(ZoneOffset.ofHours(-6));
-
-//
         System.out.println("instant : " + instant);
         //System.out.println("toEpochMilli : " + instant.toEpochMilli());
 
+
+    }
+
+    private static List<Order> buildOrdersForGracePeriod() {
+
+        var orderItems = List.of(
+                new OrderLineItem("Bananas", 2, new BigDecimal("2.00")),
+                new OrderLineItem("Iphone Charger", 1, new BigDecimal("25.00"))
+        );
+
+        var orderItemsRestaurant = List.of(
+                new OrderLineItem("Pizza", 2, new BigDecimal("12.00")),
+                new OrderLineItem("Coffee", 1, new BigDecimal("3.00"))
+        );
+
+        var order1 = new Order(12345, "store_999",
+                new BigDecimal("27.00"),
+                OrderType.RESTAURANT,
+                orderItems,
+                LocalDateTime.parse("2023-01-06T18:50:21")
+        );
+
+        var order2 = new Order(54321, "store_999",
+                new BigDecimal("15.00"),
+                OrderType.RESTAURANT,
+                orderItemsRestaurant,
+                LocalDateTime.parse("2023-01-06T18:50:21")
+        );
+
+        var order3 = new Order(54321, "store_999",
+                new BigDecimal("15.00"),
+                OrderType.RESTAURANT,
+                orderItemsRestaurant,
+                LocalDateTime.parse("2023-01-06T18:50:22")
+        );
+
+        return List.of(
+                order1,
+                order2,
+                order3
+        );
 
     }
 

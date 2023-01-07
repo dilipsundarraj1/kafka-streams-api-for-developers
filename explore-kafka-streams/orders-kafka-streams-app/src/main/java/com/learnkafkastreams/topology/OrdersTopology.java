@@ -81,9 +81,9 @@ public class OrdersTopology {
 //                                    );
 
                             //aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
-                         //   aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
+                           aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
                             //aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
-                            aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
+                            //aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
 
                         }))
                 .branch(restaurantPredicate,
@@ -96,9 +96,9 @@ public class OrdersTopology {
 //                                    );
 
                             //aggregateOrdersByCount(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT);
-                           // aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
+                            aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
                             //aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
-                            aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
+                           // aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
                         }));
 
 
@@ -202,7 +202,7 @@ public class OrdersTopology {
     private static void aggregateOrdersCountByTimeWindows(KStream<String, Order> generalOrdersStream, String storeName) {
 
         Duration windowSize = Duration.ofSeconds(30);
-        Duration graceWindowsSize = Duration.ofSeconds(5);
+        Duration graceWindowsSize = Duration.ofSeconds(10);
 
         TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
 
