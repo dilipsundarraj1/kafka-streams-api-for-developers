@@ -67,9 +67,10 @@ docker exec -it broker bash
 kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-uppercase
 ```
 
-```
-kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-uppercase --from-beginning
+- Command to consume with Key
 
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings_uppercase --from-beginning -property "key.separator= - " --property "print.key=true"
 ```
 
 ### List Topics
