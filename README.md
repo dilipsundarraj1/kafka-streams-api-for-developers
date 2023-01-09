@@ -51,7 +51,7 @@ kafka-console-producer --broker-list localhost:9092 --topic greetings --property
 - Publish to **greetings-spanish** topic with key and value
 
 ```
- kafka-console-producer --broker-list localhost:9092 --topic greetings-spanish --property "key.separator=-" --property "parse.key=true"
+ kafka-console-producer --broker-list localhost:9092 --topic greetings_spanish --property "key.separator=-" --property "parse.key=true"
 ```
 
 #### Consume Messages
@@ -64,7 +64,7 @@ docker exec -it broker bash
 - Command to consume messages from the Kafka topic.
 
 ```
-kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings-uppercase
+kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings_uppercase
 ```
 
 - Command to consume with Key
