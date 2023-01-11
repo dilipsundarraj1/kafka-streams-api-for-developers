@@ -25,7 +25,7 @@ public class SerdesFactory {
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        return  Serdes.serdeFrom(new GreetingSerializer(objectMapper), new GreetingDeserializer(objectMapper));
+        return  new GreetingSerdes();
     }
 
     public static Serde<AlphabetWordAggregate> alphabetWordAggregate() {
