@@ -1,5 +1,7 @@
 package com.learnkafkastreams.launcher;
 
+import com.learnkafkastreams.exceptionhandler.StreamsDeserializationErrorHandler;
+import com.learnkafkastreams.exceptionhandler.StreamsProcessorCustomErrorHandler;
 import com.learnkafkastreams.topology.GreetingsTopology;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -9,6 +11,7 @@ import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.errors.LogAndContinueExceptionHandler;
 
 import java.util.List;
 import java.util.Properties;
@@ -32,9 +35,21 @@ public class GreetingsStreamApp {
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
        // config.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, streamThreads+""); // read only the new messages
+
+        //error-handling config
+        //desrialization errors
+        config.put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG,
+        //        LogAndContinueExceptionHandler.class
+                StreamsDeserializationErrorHandler.class
+        );
+
+
+       // config.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, streamThreads+"");
         createTopics(config, List.of(GREETINGS, GREETINGS_UPPERCASE, GREETINGS_SPANISH));
 
         var kafkaStreams = new KafkaStreams(greetingsTopology, config);
+
+        kafkaStreams.setUncaughtExceptionHandler(new StreamsProcessorCustomErrorHandler());
 
         //This closes the streams anytime the JVM shuts down normally or abruptly.
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));

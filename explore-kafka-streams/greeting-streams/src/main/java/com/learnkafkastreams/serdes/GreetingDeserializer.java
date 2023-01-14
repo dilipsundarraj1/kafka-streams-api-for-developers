@@ -22,11 +22,10 @@ public class GreetingDeserializer implements Deserializer<Greeting> {
             return objectMapper.readValue(data, Greeting.class);
         } catch (IOException e) {
             log.error("IOException : {}", e.getMessage(), e);
-            //throw new RuntimeException(e);
+            throw new RuntimeException(e);
         } catch (Exception e) {
             log.error("Exception : {}", e.getMessage(), e);
-            //throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
-        return null;
     }
 }
