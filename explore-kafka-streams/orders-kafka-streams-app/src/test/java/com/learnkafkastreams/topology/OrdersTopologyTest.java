@@ -82,6 +82,39 @@ class OrdersTopologyTest {
 
     }
 
+    @Test
+    void ordersRevenue_multipleOrdersPerStore() {
+
+        var address1 = new Address("1234 Street 1 ", "", "City1", "State1", "12345");
+        var store1 = new Store("store_1234",
+                address1,
+                "1234567890"
+        );
+
+        storesInputTopic.pipeInput(store1.locationId(), store1);
+
+        ordersInputTopic.pipeKeyValueList(orders());
+
+        ordersInputTopic.pipeKeyValueList(orders());
+
+        ReadOnlyKeyValueStore<String, TotalRevenue> generalOrdersRevenue = topologyTestDriver.getKeyValueStore(GENERAL_ORDERS_REVENUE);
+        System.out.println("ordersRevenueStore : " + generalOrdersRevenue);
+
+        var generalOrderWithRevenue = generalOrdersRevenue.get("store_1234");
+        assertEquals(2, generalOrderWithRevenue.runnuingOrderCount());
+        assertEquals(new BigDecimal("54.00"), generalOrderWithRevenue.runningRevenue());
+
+
+
+        ReadOnlyKeyValueStore<String, TotalRevenue> restaurantOrdersRevenue = topologyTestDriver.getKeyValueStore(RESTAURANT_ORDERS_REVENUE);
+        System.out.println("restaurantOrdersRevenue : " + restaurantOrdersRevenue);
+
+        var restaurantOrderWithRevenue = restaurantOrdersRevenue.get("store_1234");
+        assertEquals(2, restaurantOrderWithRevenue.runnuingOrderCount());
+        assertEquals(new BigDecimal("30.00"), restaurantOrderWithRevenue.runningRevenue());
+
+    }
+
 
     static List<KeyValue<String, Order>> orders(){
 
