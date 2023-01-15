@@ -2,6 +2,7 @@ package com.learnkafkastreams.launcher;
 
 import com.learnkafkastreams.exceptionhandler.StreamsDeserializationErrorHandler;
 import com.learnkafkastreams.exceptionhandler.StreamsProcessorCustomErrorHandler;
+import com.learnkafkastreams.exceptionhandler.StreamsSerializationExceptionHandler;
 import com.learnkafkastreams.topology.GreetingsTopology;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -41,12 +42,18 @@ public class GreetingsStreamApp {
                 StreamsDeserializationErrorHandler.class
         );
 
+        //serialization errors
+
+        config.put(StreamsConfig.DEFAULT_PRODUCTION_EXCEPTION_HANDLER_CLASS_CONFIG,
+                StreamsSerializationExceptionHandler.class
+        );
 
        // config.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, streamThreads+"");
         createTopics(config, List.of(GREETINGS, GREETINGS_UPPERCASE, GREETINGS_SPANISH));
 
         var kafkaStreams = new KafkaStreams(greetingsTopology, config);
 
+        //set the processor exceptiopn handler
         kafkaStreams.setUncaughtExceptionHandler(new StreamsProcessorCustomErrorHandler());
 
         //This closes the streams anytime the JVM shuts down normally or abruptly.
