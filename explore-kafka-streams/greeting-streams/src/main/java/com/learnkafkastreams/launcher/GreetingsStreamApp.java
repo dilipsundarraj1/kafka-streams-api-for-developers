@@ -43,7 +43,6 @@ public class GreetingsStreamApp {
         );
 
         //serialization errors
-
         config.put(StreamsConfig.DEFAULT_PRODUCTION_EXCEPTION_HANDLER_CLASS_CONFIG,
                 StreamsSerializationExceptionHandler.class
         );
