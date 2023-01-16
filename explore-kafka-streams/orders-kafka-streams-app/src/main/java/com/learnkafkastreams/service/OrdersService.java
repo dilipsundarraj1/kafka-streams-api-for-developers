@@ -9,11 +9,11 @@ import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 
 @Slf4j
-public class OrdersService {
+public class OrdersService<T> {
 
     private KafkaStreams streams;
 
-    ReadOnlyKeyValueStore<String, TotalRevenue> getStore(String storeName) {
+    ReadOnlyKeyValueStore<String, T> getStore(String storeName) {
         return streams.store(
                 StoreQueryParameters.fromNameAndType(
                         // state store name
