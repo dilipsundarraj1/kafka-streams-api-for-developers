@@ -73,6 +73,17 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings_upper
 kafka-console-consumer --bootstrap-server localhost:9092 --topic greetings_uppercase --from-beginning -property "key.separator= - " --property "print.key=true"
 ```
 
+- Other Helpful Kafka Consumer commands
+
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic general_orders
+```
+
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic restaurant_orders
+```
+
+
 ### List Topics
 
 - This  command should take care of logging in to the Kafka container.
