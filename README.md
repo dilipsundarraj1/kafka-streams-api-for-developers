@@ -41,11 +41,6 @@ docker exec -it broker bash
 kafka-console-producer --broker-list localhost:9092 --topic greetings
 ```
 
-```
-kafka-console-producer --broker-list localhost:9092 --topic greetings --from-beginning
-```
-
-
 - Publish to **greetings** topic with key and value
 
 ```
@@ -86,6 +81,10 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic general_orders
 
 ```
 kafka-console-consumer --bootstrap-server localhost:9092 --topic restaurant_orders
+```
+
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic ktable-words-store-changelog --from-beginning
 ```
 
 
