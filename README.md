@@ -41,6 +41,11 @@ docker exec -it broker bash
 kafka-console-producer --broker-list localhost:9092 --topic greetings
 ```
 
+```
+kafka-console-producer --broker-list localhost:9092 --topic greetings --from-beginning
+```
+
+
 - Publish to **greetings** topic with key and value
 
 ```
