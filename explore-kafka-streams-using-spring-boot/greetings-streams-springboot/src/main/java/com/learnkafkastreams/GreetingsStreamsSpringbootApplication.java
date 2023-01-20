@@ -16,7 +16,6 @@ public class GreetingsStreamsSpringbootApplication {
 		log.info("String Serde : {} ", Serdes.StringSerde.class );
 		SpringApplication.run(GreetingsStreamsSpringbootApplication.class, args);
 
-
 	}
 
 }

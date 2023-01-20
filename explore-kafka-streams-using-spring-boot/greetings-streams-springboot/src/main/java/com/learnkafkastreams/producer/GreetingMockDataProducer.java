@@ -21,8 +21,8 @@ public class GreetingMockDataProducer {
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-      //  greetingsString();
-        englishGreetings(objectMapper);
+      greetingsString();
+        //englishGreetings(objectMapper);
 
     }
 
