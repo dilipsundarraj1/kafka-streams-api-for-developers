@@ -21,8 +21,8 @@ public class GreetingMockDataProducer {
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-      greetingsString();
-        //englishGreetings(objectMapper);
+      //greetingsString();
+        englishGreetings(objectMapper);
 
     }
 
@@ -44,6 +44,7 @@ public class GreetingMockDataProducer {
 
     private static void englishGreetings(ObjectMapper objectMapper) {
         var englishGreetings = List.of(
+                new Greeting("Error", LocalDateTime.now()),
                 new Greeting("Hello, Good Morning!", LocalDateTime.now()),
                 new Greeting("Hello, Good Evening!", LocalDateTime.now()),
                 new Greeting("Hello, Good Night!", LocalDateTime.now())

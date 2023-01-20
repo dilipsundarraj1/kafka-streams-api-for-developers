@@ -17,7 +17,7 @@ public class StreamsProcessorCustomErrorHandler implements StreamsUncaughtExcept
             }
         }
         log.error("Shutdown the client");
-        return StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
-        //return StreamThreadExceptionResponse.SHUTDOWN_APPLICATION;
+        //return StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
+        return StreamThreadExceptionResponse.SHUTDOWN_APPLICATION;
     }
 }

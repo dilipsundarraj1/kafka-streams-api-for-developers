@@ -1,4 +1,6 @@
 spring:
+  main:
+      allow-bean-definition-overriding: true
   application:
     name: greeting-kafka-streams
   profiles:
@@ -22,3 +24,6 @@ spring:
           exception:
 #            handler: 'org.apache.kafka.streams.errors.LogAndContinueExceptionHandler'
 #            handler: 'com.learnkafkastreams.exceptionhandler.StreamsDeserializationErrorHandler'
+        serialization:
+          exception:
+            handler: 'com.learnkafkastreams.exceptionhandler.StreamsSerializationExceptionHandler'
