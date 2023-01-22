@@ -21,20 +21,22 @@ public class ExploreAggregateOperatorsTopology {
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
 
-        var wordsTable = streamsBuilder
+        var inputStream = streamsBuilder
                 .stream(AGGREGATE, Consumed.with(Serdes.String(), Serdes.String()));
 
-        wordsTable
-                .print(Printed.<String,String>toSysOut().withLabel("words"));
+        inputStream
+                .print(Printed.<String,String>toSysOut().withLabel(AGGREGATE));
 
-        var groupedString = wordsTable
+        var groupedString = inputStream
                 //.selectKey((key, value) -> String.valueOf(value.charAt(0)))// Apple -> A, Ambulance -> A
-                .map((key, value) -> KeyValue.pair(String.valueOf(value.charAt(0)), value))
-                .groupByKey(Grouped.with(Serdes.String(), Serdes.String()));
+                //.map((key, value) -> KeyValue.pair(String.valueOf(value.charAt(0)), value))
+                //.groupByKey(Grouped.with(Serdes.String(), Serdes.String()));
+                .groupBy((key, value) -> value,
+                        Grouped.with(Serdes.String(), Serdes.String()));
 
-        //exploreCount(groupedString);
+        exploreCount(groupedString);
         //exploreReduce(groupedString);
-        exploreAggregate(groupedString);
+        //exploreAggregate(groupedString);
         return streamsBuilder.build();
     }
 
@@ -84,6 +86,7 @@ public class ExploreAggregateOperatorsTopology {
 
         countByAlphabet
                 .toStream()
+                .peek((key, value) -> log.info("Key : {} , Value : {}", key, value))
                 .print(Printed.<String,Long>toSysOut().withLabel("Words-Count-Per-Alphabet"));
     }
 
