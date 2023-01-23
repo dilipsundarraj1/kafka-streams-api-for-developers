@@ -87,6 +87,12 @@ kafka-console-consumer --bootstrap-server localhost:9092 --topic restaurant_orde
 kafka-console-consumer --bootstrap-server localhost:9092 --topic ktable-words-store-changelog --from-beginning
 ```
 
+- Command to read from the Internal Aggregate topic
+
+```
+kafka-console-consumer --bootstrap-server localhost:9092 --topic aggregate-KSTREAM-AGGREGATE-STATE-STORE-0000000003-changelog --from-beginning -property "key.separator= - " --property "print.key=true"
+```
+
 
 ### List Topics
 
