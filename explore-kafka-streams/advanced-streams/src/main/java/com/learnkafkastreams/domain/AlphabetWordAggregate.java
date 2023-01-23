@@ -17,13 +17,8 @@ public record AlphabetWordAggregate(String key,
 
 
     public AlphabetWordAggregate updateNewEvents(String key, String neVwalue){
-        log.info("Before the update : {} ", this );
-        log.info("New Record : key : {} , value : {} : ", key, neVwalue );
-        var newRunningCount = this.runningCount +1;
-        valueList.add(neVwalue);
-        var aggregated = new AlphabetWordAggregate(key, valueList, newRunningCount);
-        log.info("aggregated : {}" , aggregated);
-        return aggregated;
+
+        return null;
     }
 
 
