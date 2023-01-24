@@ -35,7 +35,7 @@ public class ExploreAggregateOperatorsTopology {
                         Grouped.with(Serdes.String(), Serdes.String()));
 
         exploreCount(groupedString);
-        //exploreReduce(groupedString);
+        exploreReduce(groupedString);
         //exploreAggregate(groupedString);
         return streamsBuilder.build();
     }
@@ -70,7 +70,12 @@ public class ExploreAggregateOperatorsTopology {
                 .reduce((value1, value2) -> {
                     log.info("value1 : {} , value2 : {} ", value1, value2);
                     return value1.toUpperCase()+"-"+value2.toUpperCase();
-                });
+                }
+                , Materialized
+                                .<String, String, KeyValueStore< Bytes, byte[]>>as("reduced-words")
+                                .withKeySerde(Serdes.String())
+                                .withValueSerde(Serdes.String())
+                );
 
         reducedStream
                 .toStream()
@@ -79,9 +84,9 @@ public class ExploreAggregateOperatorsTopology {
 
     private static void exploreCount(KGroupedStream<String, String> groupedString) {
         var countByAlphabet = groupedString
-                .count(Named.as("count-per-alphabet"));
-//                .count(Named.as("count-per-alphabet"),
-//                        Materialized.as("count-per-alphabet"));// defining a state-store and saving the state data in rocksDB and changelog topic
+                //.count(Named.as("count-per-alphabet"));
+                .count(Named.as("count-per-alphabet"),
+                        Materialized.as("count-per-alphabet"));// defining a state-store and saving the state data in rocksDB and changelog topic
 
 
         countByAlphabet
