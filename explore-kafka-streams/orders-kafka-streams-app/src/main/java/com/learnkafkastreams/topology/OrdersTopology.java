@@ -191,7 +191,8 @@ public class OrdersTopology {
         var generalOrdersCount = generalOrdersStream
                 .map((key, value) -> KeyValue.pair(value.locationId(), value))
                 .groupByKey(Grouped.with(Serdes.String(), SerdesFactory.orderSerdes()))
-                .count(Named.as(storeName));
+                .count(Named.as(storeName),
+                        Materialized.as(storeName));
 
         generalOrdersCount
                 .toStream()
