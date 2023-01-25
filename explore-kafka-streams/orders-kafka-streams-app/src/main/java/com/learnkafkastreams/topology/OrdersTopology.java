@@ -82,7 +82,7 @@ public class OrdersTopology {
 
                             aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
                            //aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
-                            //aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
+                            aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
                             aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
 
                         }))
@@ -109,7 +109,7 @@ public class OrdersTopology {
     private static void aggregateOrdersByRevenue(KStream<String, Order> generalOrdersStream, String aggregateStoreName, KTable<String, Store> storesTable) {
 
 
-        Initializer<TotalRevenue> alphabetWordAggregateInitializer = TotalRevenue::new;
+        Initializer<TotalRevenue> totalRevenueInitializer = TotalRevenue::new;
 
         Aggregator<String, Order, TotalRevenue> aggregator   = (key,order, totalRevenue )-> {
             return totalRevenue.updateRunningRevenue(key, order);
@@ -118,7 +118,7 @@ public class OrdersTopology {
         var revenueTable = generalOrdersStream
                 .map((key, value) -> KeyValue.pair(value.locationId(), value))
                 .groupByKey(Grouped.with(Serdes.String(), SerdesFactory.orderSerdes()))
-                .aggregate(alphabetWordAggregateInitializer,
+                .aggregate(totalRevenueInitializer,
                         aggregator,
                         Materialized
                                 .<String, TotalRevenue, KeyValueStore<Bytes, byte[]>>as(aggregateStoreName)
