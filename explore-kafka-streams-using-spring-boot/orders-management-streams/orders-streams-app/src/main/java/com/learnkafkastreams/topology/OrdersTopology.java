@@ -1,9 +1,7 @@
 package com.learnkafkastreams.topology;
 
-import com.learnkafkastreams.domain.Order;
-import com.learnkafkastreams.domain.Store;
-import com.learnkafkastreams.domain.TotalRevenue;
-import com.learnkafkastreams.domain.TotalRevenueWithAddress;
+import com.learnkafkastreams.domain.*;
+import com.learnkafkastreams.util.OrderTimeStampExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
@@ -15,6 +13,7 @@ import org.apache.kafka.streams.state.WindowStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -22,10 +21,81 @@ import java.time.ZoneId;
 @Slf4j
 public class OrdersTopology {
 
-    public static String ORDERS = "orders";
+    public static final String ORDERS = "orders";
+    public static final String GENERAL_ORDERS = "general_orders";
+    public static final String GENERAL_ORDERS_COUNT = "general_orders_count";
+    public static final String GENERAL_ORDERS_COUNT_WINDOWS = "general_orders_count_window";
+    public static final String GENERAL_ORDERS_REVENUE = "general_orders_revenue";
+    public static final String GENERAL_ORDERS_REVENUE_WINDOWS = "general_orders_revenue_window";
+
+    public static final String RESTAURANT_ORDERS = "restaurant_orders";
+    public static final String RESTAURANT_ORDERS_COUNT = "restaurant_orders_count";
+    public static final String RESTAURANT_ORDERS_REVENUE = "restaurant_orders_revenue";
+    public static final String RESTAURANT_ORDERS_COUNT_WINDOWS = "restaurant_orders_count_window";
+    public static final String RESTAURANT_ORDERS_REVENUE_WINDOWS = "restaurant_orders_revenue_window";
+    public static final String STORES = "stores";
+
+
 
     @Autowired
     public void process(StreamsBuilder streamsBuilder) {
+
+        Predicate<String, Order> generalPredicate = (key, order) -> order.orderType().equals(OrderType.GENERAL);
+        Predicate<String, Order> restaurantPredicate = (key, order) -> order.orderType().equals(OrderType.RESTAURANT);
+
+
+        var orderStreams = streamsBuilder
+                .stream(ORDERS,
+                        Consumed.with(Serdes.String(), new JsonSerde<>(Order.class))
+                                .withTimestampExtractor(new OrderTimeStampExtractor())
+                );
+
+        var storesTable = streamsBuilder
+                .table(STORES,
+                        Consumed.with(Serdes.String(), new JsonSerde<>(Store.class)));
+
+        storesTable
+                .toStream()
+                .print(Printed.<String,Store>toSysOut().withLabel("stores"));
+
+        orderStreams
+                .print(Printed.<String, Order>toSysOut().withLabel("orders"));
+
+        ValueMapper<Order, Revenue> revenueMapper = (order) -> new Revenue(order.locationId(), order.finalAmount());
+
+
+        orderStreams
+                .filter((key, value) -> value.finalAmount().compareTo( new BigDecimal("10.00")) > 0)
+                .split(Named.as("General-restaurant-stream"))
+                .branch(generalPredicate,
+                        Branched.withConsumer(generalOrdersStream -> {
+//                            generalOrdersStream
+//                                    .mapValues((readOnlyKey, value) -> revenueMapper.apply(value))
+//                                    .to(GENERAL_ORDERS,
+//                                    //        Produced.with(Serdes.String(), SerdesFactory.orderSerdes())
+//                                            Produced.with(Serdes.String(), SerdesFactory.revenueSerdes())
+//                                    );
+
+                            aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
+                            //aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
+                            aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
+                            aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
+
+                        }))
+                .branch(restaurantPredicate,
+                        Branched.withConsumer(restaurantOrdersStream -> {
+//                            restaurantOrdersStream
+//                                    .mapValues((readOnlyKey, value) -> revenueMapper.apply(value))
+//                                    .to(RESTAURANT_ORDERS,
+//                                    //        Produced.with(Serdes.String(), SerdesFactory.orderSerdes())
+//                                            Produced.with(Serdes.String(), SerdesFactory.revenueSerdes())
+//                                    );
+
+                            aggregateOrdersByCount(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT);
+                            // aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
+                            //aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
+                            aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
+                        }));
 
     }
 
