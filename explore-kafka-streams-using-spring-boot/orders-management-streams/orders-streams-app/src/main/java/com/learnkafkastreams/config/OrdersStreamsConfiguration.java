@@ -1,7 +1,7 @@
 package com.learnkafkastreams.config;
 
 import com.learnkafkastreams.exceptionhandler.StreamsProcessorCustomErrorHandler;
-import com.learnkafkastreams.topology.GreetingsStreamsTopology;
+import com.learnkafkastreams.topology.OrdersTopology;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.TopicPartition;
@@ -22,7 +22,7 @@ import org.springframework.kafka.streams.RecoveringDeserializationExceptionHandl
 
 @Configuration
 @Slf4j
-public class GreetingsStreamsConfiguration {
+public class OrdersStreamsConfiguration {
     //KafkaStreamsDefaultConfiguration -> Class Responsible for configuring the KafkaStreams in SpringBoot
     @Autowired
     KafkaProperties kafkaProperties;
@@ -65,7 +65,16 @@ public class GreetingsStreamsConfiguration {
 
     @Bean
     public NewTopic topicBuilder() {
-        return TopicBuilder.name(GreetingsStreamsTopology.GREETINGS)
+        return TopicBuilder.name(OrdersTopology.ORDERS)
+                .partitions(2)
+                .replicas(1)
+                .build();
+
+    }
+
+    @Bean
+    public NewTopic storeTopicBuilder() {
+        return TopicBuilder.name(OrdersTopology.STORES)
                 .partitions(2)
                 .replicas(1)
                 .build();
