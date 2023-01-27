@@ -7,6 +7,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -55,5 +56,12 @@ public class ProducerUtil {
             log.error("Exception in  publishMessageSync : {}  ", e.getMessage(), e);
         }
         return recordMetadata;
+    }
+
+    public static void publishMessageSync(ArrayList<ProducerRecord<String, String>> producerRecords) {
+
+        producerRecords.forEach(producerRecord -> getRecordMetadata(producerRecord));
+
+
     }
 }
