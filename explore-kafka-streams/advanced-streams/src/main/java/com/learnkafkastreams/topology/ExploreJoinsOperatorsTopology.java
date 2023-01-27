@@ -20,8 +20,9 @@ public class ExploreJoinsOperatorsTopology {
     public static Topology build(){
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
-        //joinKStreamWithKTable(streamsBuilder);
-       // joinKTables(streamsBuilder);
+        joinKStreamWithKTable(streamsBuilder);
+        joinKStreamWithGlobalKTable(streamsBuilder);
+        joinKTables(streamsBuilder);
        joinKStreams(streamsBuilder);
 
 
@@ -48,16 +49,16 @@ public class ExploreJoinsOperatorsTopology {
         var joinedParams =
                 StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String());
 
-        JoinWindows tenSecondWindow =  JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5));
+        JoinWindows fiveSecondWindow=  JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5));
 
         ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
 
-//        var joinedStream = alphabetsAbbreviation
-//                .join(alphabetsStream,
-//                        valueJoiner,
-//                        tenSecondWindow
-//                        , joinedParams
-//                );
+        var joinedStream = alphabetsAbbreviation
+                .join(alphabetsStream,
+                        valueJoiner,
+                        fiveSecondWindow
+                        , joinedParams
+                );
 
     /* leftJoin:
              If there is an event for the alphabetsAbbreviation stream , the join will be triggered even if there is no event in the alphabetsStream.
@@ -66,18 +67,18 @@ public class ExploreJoinsOperatorsTopology {
         var joinedStream = alphabetsAbbreviation
                 .leftJoin(alphabetsStream,
                         valueJoiner,
-                        tenSecondWindow
+                        fiveSecondWindow
                         , joinedParams
                 );
 */
 
     /* outerJoin:*/
-                var joinedStream = alphabetsAbbreviation
-                .outerJoin(alphabetsStream,
-                        valueJoiner,
-                        tenSecondWindow
-                        , joinedParams
-                );
+//                var joinedStream = alphabetsAbbreviation
+//                .outerJoin(alphabetsStream,
+//                        valueJoiner,
+//                        fiveSecondWindow
+//                        , joinedParams
+//                );
 
         joinedStream
                 .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
@@ -142,6 +143,9 @@ public class ExploreJoinsOperatorsTopology {
                 .join(alphabetsTable,
                         valueJoiner);
 
+        //[alphabets-with-abbreviations]: A, Alphabet[abbreviation=Apple, description=A is the first letter in English Alphabets.]
+        //[alphabets-with-abbreviations]: B, Alphabet[abbreviation=Bus, description=B is the second letter in English Alphabets.]
+
         joinedStream
                 .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
     }
@@ -165,7 +169,9 @@ public class ExploreJoinsOperatorsTopology {
                 (leftKey, rightKey) -> leftKey;
 
         var joinedStream = alphabetsAbbreviation
-                .join(alphabetsTable,keyMapper,valueJoiner);
+                .join(alphabetsTable
+                ,keyMapper,valueJoiner
+                );
 
         joinedStream
                 .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations"));
