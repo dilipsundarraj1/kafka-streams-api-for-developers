@@ -79,7 +79,7 @@ public class OrdersTopology {
                             aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
                             //aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
                             aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
-                            aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
+                            //aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
 
                         }))
                 .branch(restaurantPredicate,
@@ -93,7 +93,8 @@ public class OrdersTopology {
 
                             aggregateOrdersByCount(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT);
                             // aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
-                            //aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
+
+                            aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
                             aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
                         }));
 
