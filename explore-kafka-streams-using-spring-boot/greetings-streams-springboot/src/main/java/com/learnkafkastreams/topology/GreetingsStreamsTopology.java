@@ -1,4 +1,4 @@
-package com.learnkafkastreams.streams;
+package com.learnkafkastreams.topology;
 
 import com.learnkafkastreams.domain.Greeting;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class GreetingsStreamsProcessor {
-
+public class GreetingsStreamsTopology {
 
     public static String GREETINGS = "greetings";
     public static String GREETINGS_OUTPUT = "greetings-output";
