@@ -11,8 +11,8 @@ public class AggregateProducer {
 
     public static void main(String[] args) throws InterruptedException {
 
-        //var key = "A";
-        String key = null;
+        var key = "A";
+        //String key = null;
 
         var word = "Apple";
         var word1 = "Alligator";
@@ -27,8 +27,8 @@ public class AggregateProducer {
         var recordMetaData2 = publishMessageSync(AGGREGATE, key,word2);
         log.info("Published the alphabet message : {} ", recordMetaData2);
 
-        //var bKey = "B";
-        String bKey = null;
+        var bKey = "B";
+        //String bKey = null;
 
         var bWord1 = "Bus";
         var bWord2 = "Baby";
