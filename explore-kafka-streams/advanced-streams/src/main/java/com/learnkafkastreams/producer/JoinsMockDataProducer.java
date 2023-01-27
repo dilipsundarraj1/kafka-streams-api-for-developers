@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Map;
 
 import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
+import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSyncWithDelay;
 import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS;
 import static com.learnkafkastreams.topology.ExploreJoinsOperatorsTopology.ALPHABETS_ABBREVATIONS;
 
@@ -18,14 +19,15 @@ public class JoinsMockDataProducer {
         var alphabetMap = Map.of(
                 "A", "A is the first letter in English Alphabets.",
                 "B", "B is the second letter in English Alphabets."
-  //              ,"E", "E is the fifth letter in English Alphabets."
+                //              ,"E", "E is the fifth letter in English Alphabets."
 //                ,
 //                "A", "A is the First letter in English Alphabets.",
 //                "B", "B is the Second letter in English Alphabets."
         );
-        publishMessages(alphabetMap, ALPHABETS);
+        //publishMessages(alphabetMap, ALPHABETS);
+        publishMessagesWithDelay(alphabetMap, ALPHABETS, -4);
 
-       // sleep(6000);
+        // sleep(6000);
 
         var alphabetAbbrevationMap = Map.of(
                 "A", "Apple",
@@ -33,15 +35,23 @@ public class JoinsMockDataProducer {
                 ,"C", "Cat"
 
         );
-       publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
+        publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
 
         alphabetAbbrevationMap = Map.of(
                 "A", "Airplane",
                 "B", "Baby."
 
         );
-       // publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
+        // publishMessages(alphabetAbbrevationMap, ALPHABETS_ABBREVATIONS);
 
+    }
+
+    private static void publishMessagesWithDelay(Map<String, String> alphabetMap, String topic, int delaySeconds) {
+        alphabetMap
+                .forEach((key, value) -> {
+                    var recordMetaData = publishMessageSyncWithDelay(topic, key,value, delaySeconds);
+                    log.info("Published the alphabet message : {} ", recordMetaData);
+                });
     }
 
     private static void publishMessages(Map<String, String> alphabetMap, String topic) {

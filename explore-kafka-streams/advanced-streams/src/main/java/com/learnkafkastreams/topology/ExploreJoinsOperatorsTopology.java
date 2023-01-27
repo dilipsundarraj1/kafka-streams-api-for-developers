@@ -20,9 +20,9 @@ public class ExploreJoinsOperatorsTopology {
     public static Topology build(){
         StreamsBuilder streamsBuilder = new StreamsBuilder();
 
-        joinKStreamWithKTable(streamsBuilder);
-        joinKStreamWithGlobalKTable(streamsBuilder);
-        joinKTables(streamsBuilder);
+//        joinKStreamWithKTable(streamsBuilder);
+//        joinKStreamWithGlobalKTable(streamsBuilder);
+//        joinKTables(streamsBuilder);
        joinKStreams(streamsBuilder);
 
 
@@ -56,8 +56,8 @@ public class ExploreJoinsOperatorsTopology {
         var joinedStream = alphabetsAbbreviation
                 .join(alphabetsStream,
                         valueJoiner,
-                        fiveSecondWindow
-                        , joinedParams
+                        fiveSecondWindow,
+                        joinedParams
                 );
 
     /* leftJoin:
