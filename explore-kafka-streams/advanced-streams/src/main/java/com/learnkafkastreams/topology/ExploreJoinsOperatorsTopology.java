@@ -53,38 +53,36 @@ public class ExploreJoinsOperatorsTopology {
                 ;
 
         JoinWindows fiveSecondWindow = JoinWindows
-                //.ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5)) // 5th second is not inclusive
-                .ofTimeDifferenceAndGrace(Duration.ofSeconds(5), Duration.ofSeconds(2))
+                .ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5)) // 5th second is not inclusive
+                //.ofTimeDifferenceAndGrace(Duration.ofSeconds(5), Duration.ofSeconds(2))
                 ;
 
         ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
 
-        var joinedStream = alphabetsAbbreviation
-                .join(alphabetsStream,
-                        valueJoiner,
-                        fiveSecondWindow,
-                        joinedParams
-                );
+//        var joinedStream = alphabetsAbbreviation
+//                .join(alphabetsStream,
+//                        valueJoiner,
+//                        fiveSecondWindow,
+//                        joinedParams
+//                );
 
     /* leftJoin:
              If there is an event for the alphabetsAbbreviation stream , the join will be triggered even if there is no event in the alphabetsStream.
              The joinedValue will have null for the description.*/
-/*
-        var joinedStream = alphabetsAbbreviation
-                .leftJoin(alphabetsStream,
-                        valueJoiner,
-                        fiveSecondWindow
-                        , joinedParams
-                );
-*/
-
-        /* outerJoin:*/
-//                var joinedStream = alphabetsAbbreviation
-//                .outerJoin(alphabetsStream,
+//        var joinedStream = alphabetsAbbreviation
+//                .leftJoin(alphabetsStream,
 //                        valueJoiner,
 //                        fiveSecondWindow
 //                        , joinedParams
 //                );
+
+        /* outerJoin:*/
+                var joinedStream = alphabetsAbbreviation
+                .outerJoin(alphabetsStream,
+                        valueJoiner,
+                        fiveSecondWindow
+                        , joinedParams
+                );
 
         joinedStream
                 .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations-kstream"));
