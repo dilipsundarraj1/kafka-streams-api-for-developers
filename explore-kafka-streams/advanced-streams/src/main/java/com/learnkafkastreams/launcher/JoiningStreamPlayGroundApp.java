@@ -29,10 +29,9 @@ public class JoiningStreamPlayGroundApp {
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         config.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, "5000");
 
+        createTopics(config, List.of(ALPHABETS,ALPHABETS_ABBREVATIONS ));
 
-      //  createTopics(config, List.of(ALPHABETS,ALPHABETS_ABBREVATIONS ));
-
-        createTopicsCopartitioningDemo(config, List.of(ALPHABETS,ALPHABETS_ABBREVATIONS ));
+        //createTopicsCopartitioningDemo(config, List.of(ALPHABETS,ALPHABETS_ABBREVATIONS ));
          var kafkaStreams = new KafkaStreams(kTableTopology, config);
 
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
@@ -50,7 +49,7 @@ public class JoiningStreamPlayGroundApp {
         var newTopics = alphabets
                 .stream()
                 .map(topic ->{
-                    if(topic.equals(ALPHABETS)){
+                    if(topic.equals(ALPHABETS_ABBREVATIONS)){
                         return new NewTopic(topic, 3, replication);
                     }
                     return new NewTopic(topic, partitions, replication);

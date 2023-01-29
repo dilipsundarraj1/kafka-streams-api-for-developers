@@ -48,8 +48,8 @@ public class ExploreJoinsOperatorsTopology {
 
         var joinedParams =
                 StreamJoined.with(Serdes.String(), Serdes.String(), Serdes.String())
-//                        .withName("alphabets-join")
-//                        .withStoreName("alphabets-join")
+                        .withName("alphabets-join")
+                        .withStoreName("alphabets-join")
                 ;
 
         JoinWindows fiveSecondWindow = JoinWindows
@@ -59,12 +59,12 @@ public class ExploreJoinsOperatorsTopology {
 
         ValueJoiner<String, String, Alphabet> valueJoiner = Alphabet::new;
 
-//        var joinedStream = alphabetsAbbreviation
-//                .join(alphabetsStream,
-//                        valueJoiner,
-//                        fiveSecondWindow,
-//                        joinedParams
-//                );
+        var joinedStream = alphabetsAbbreviation
+                .join(alphabetsStream,
+                        valueJoiner,
+                        fiveSecondWindow,
+                        joinedParams
+                );
 
     /* leftJoin:
              If there is an event for the alphabetsAbbreviation stream , the join will be triggered even if there is no event in the alphabetsStream.
@@ -77,12 +77,12 @@ public class ExploreJoinsOperatorsTopology {
 //                );
 
         /* outerJoin:*/
-                var joinedStream = alphabetsAbbreviation
-                .outerJoin(alphabetsStream,
-                        valueJoiner,
-                        fiveSecondWindow
-                        , joinedParams
-                );
+//                var joinedStream = alphabetsAbbreviation
+//                .outerJoin(alphabetsStream,
+//                        valueJoiner,
+//                        fiveSecondWindow
+//                        , joinedParams
+//                );
 
         joinedStream
                 .print(Printed.<String, Alphabet>toSysOut().withLabel("alphabets-with-abbreviations-kstream"));

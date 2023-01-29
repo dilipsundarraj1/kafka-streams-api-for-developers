@@ -32,7 +32,7 @@ public class JoinsMockDataProducer {
         //JoinWindows
         //-4 & 4 will trigger the join
         //-6 -5 & 5, 6 wont trigger the join
-        //publishMessagesWithDelay(alphabetMap, ALPHABETS, 4);
+       // publishMessagesWithDelay(alphabetMap, ALPHABETS, 4);
 
         var alphabetAbbrevationMap = Map.of(
                 "A", "Apple",
