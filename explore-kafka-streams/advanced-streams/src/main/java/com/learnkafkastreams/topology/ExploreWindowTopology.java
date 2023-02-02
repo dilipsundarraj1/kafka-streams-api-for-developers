@@ -34,12 +34,12 @@ public class ExploreWindowTopology {
     }
 
     private static void tumblingWindow(KStream<String, String> wordsStream) {
-        Duration windowSize = Duration.ofSeconds(30);
-        Duration graceWindowsSize = Duration.ofSeconds(5);
+        Duration windowSize = Duration.ofSeconds(5);
+        Duration graceWindowsSize = Duration.ofSeconds(2);
 
-//        TimeWindows hoppingWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
+        TimeWindows hoppingWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
 
-        TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
+        //TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
 
         wordsStream
                 .groupByKey()
@@ -78,8 +78,8 @@ public class ExploreWindowTopology {
     }
 
     private static void hoppingWindow(KStream<String, String> wordsStream) {
-        Duration windowSize = Duration.ofSeconds(30);
-        Duration advanceBySize = Duration.ofSeconds(10);
+        Duration windowSize = Duration.ofSeconds(5);
+        Duration advanceBySize = Duration.ofSeconds(3);
 
         TimeWindows hoppingWindow = TimeWindows.ofSizeWithNoGrace(windowSize)
                 .advanceBy(advanceBySize);
@@ -88,8 +88,7 @@ public class ExploreWindowTopology {
                 .groupByKey()
                 .windowedBy(hoppingWindow)
                 .count()
-                //.suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull()))
-
+                .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull()))
                 .toStream()
                 .peek(((key, value) -> {
                     log.info("hoppingWindow : key : {}, value : {}", key, value);
