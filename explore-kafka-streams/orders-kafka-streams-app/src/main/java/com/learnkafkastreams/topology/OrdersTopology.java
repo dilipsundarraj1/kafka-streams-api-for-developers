@@ -80,9 +80,9 @@ public class OrdersTopology {
 //                                            Produced.with(Serdes.String(), SerdesFactory.revenueSerdes())
 //                                    );
 
-                            aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
-                           //aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
-                            aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
+                            //aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
+                           aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
+                            //aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
                             aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
 
                         }))
@@ -95,10 +95,10 @@ public class OrdersTopology {
 //                                            Produced.with(Serdes.String(), SerdesFactory.revenueSerdes())
 //                                    );
 
-                            aggregateOrdersByCount(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT);
-                           // aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
-                            aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
-                           //aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
+                           // aggregateOrdersByCount(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT);
+                           aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
+                            //aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
+                           aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
                         }));
 
 
@@ -144,12 +144,11 @@ public class OrdersTopology {
 
     private static void aggregateOrdersRevenueByWindows(KStream<String, Order> generalOrdersStream, String aggregateStoreName, KTable<String, Store> storesTable) {
 
-        var windowSize =30;
-        Duration windowSizeDuration = Duration.ofSeconds(windowSize);
+        Duration windowSize = Duration.ofSeconds(15);
         Duration graceWindowsSize = Duration.ofSeconds(5);
 
-        TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSizeDuration, graceWindowsSize);
-
+        TimeWindows timeWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
+        //TimeWindows timeWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
         Initializer<TotalRevenue> alphabetWordAggregateInitializer = TotalRevenue::new;
 
         Aggregator<String, Order, TotalRevenue> aggregator   = (key,order, totalRevenue )-> {
@@ -159,7 +158,7 @@ public class OrdersTopology {
         var revenueTable = generalOrdersStream
                 .map((key, value) -> KeyValue.pair(value.locationId(), value))
                 .groupByKey(Grouped.with(Serdes.String(), SerdesFactory.orderSerdes()))
-                .windowedBy(hoppingWindow)
+                .windowedBy(timeWindow)
                 .aggregate(alphabetWordAggregateInitializer,
                         aggregator
                         ,Materialized
@@ -175,14 +174,22 @@ public class OrdersTopology {
                     printLocalDateTimes(key, value);
                 }))
                 .print(Printed.<Windowed<String>,TotalRevenue>toSysOut().withLabel(aggregateStoreName));
-//
-//        ValueJoiner<TotalRevenue, Store, TotalRevenueWithAddress> valueJoiner = TotalRevenueWithAddress::new;
-//
-//        revenueTable
-//                .toStream()
-//                .map((key, value) -> KeyValue.pair(key.key(), value))
-//                .leftJoin(storesTable,valueJoiner)
-//                .print(Printed.<String,TotalRevenueWithAddress>toSysOut().withLabel(aggregateStoreName+"-bystore"));
+
+        ValueJoiner<TotalRevenue, Store, TotalRevenueWithAddress> valueJoiner = TotalRevenueWithAddress::new;
+
+        var joinedParams =
+                Joined.with(Serdes.String(), SerdesFactory.totalRevenueSerdes(), SerdesFactory.storeSerdes());
+        revenueTable
+                .toStream()
+                .peek(((key, value) -> {
+                    log.info(" {} : tumblingWindow : key : {}, value : {}",aggregateStoreName, key, value);
+                    printLocalDateTimes(key, value);
+                }))
+                .map((key, value) -> KeyValue.pair(key.key(), value))
+                .join(storesTable,valueJoiner
+                        ,joinedParams
+                )
+                .print(Printed.<String,TotalRevenueWithAddress>toSysOut().withLabel(aggregateStoreName+"-bystore"));
 
     }
 
@@ -202,16 +209,18 @@ public class OrdersTopology {
 
     private static void aggregateOrdersCountByTimeWindows(KStream<String, Order> generalOrdersStream, String storeName) {
 
-        Duration windowSize = Duration.ofSeconds(30);
-        Duration graceWindowsSize = Duration.ofSeconds(10);
+        Duration windowSize = Duration.ofSeconds(15);
+        Duration graceWindowsSize = Duration.ofSeconds(5);
 
-        TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
+        TimeWindows timeWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
+        //TimeWindows timeWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
 
         var generalOrdersCount = generalOrdersStream
                 .map((key, value) -> KeyValue.pair(value.locationId(), value))
                 .groupByKey(Grouped.with(Serdes.String(), SerdesFactory.orderSerdes()))
-                .windowedBy(hoppingWindow)
-                .count(Named.as(storeName))
+                .windowedBy(timeWindow)
+                .count(Named.as(storeName),
+                        Materialized.as(storeName))
                 .suppress(Suppressed
                         .untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull())
                 );

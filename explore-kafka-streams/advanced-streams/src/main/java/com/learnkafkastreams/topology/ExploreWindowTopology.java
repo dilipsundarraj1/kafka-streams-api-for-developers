@@ -26,9 +26,9 @@ public class ExploreWindowTopology {
       //  wordsStream.print(Printed.<String,String>toSysOut().withLabel("words"));
 
 
-        tumblingWindow(wordsStream);
+        //tumblingWindow(wordsStream);
         //hoppingWindow(wordsStream);
-       //slidingWindow(wordsStream);
+       slidingWindow(wordsStream);
 
         return streamsBuilder.build();
     }
@@ -61,7 +61,7 @@ public class ExploreWindowTopology {
     private static void slidingWindow(KStream<String, String> wordsStream) {
 
         SlidingWindows slidingWindow = SlidingWindows
-                .ofTimeDifferenceWithNoGrace(Duration.ofSeconds(30));
+                .ofTimeDifferenceWithNoGrace(Duration.ofSeconds(5));
 
         wordsStream
                 .groupByKey()

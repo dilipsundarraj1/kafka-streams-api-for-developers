@@ -13,8 +13,8 @@ public class WindowsMockDataProduer {
 
     public static void main(String[] args) throws InterruptedException {
 
-        bulkMockDataProducer();
-        //bulkMockDataProducer_SlidingWindows();
+        //bulkMockDataProducer();
+        bulkMockDataProducer_SlidingWindows();
 
     }
 

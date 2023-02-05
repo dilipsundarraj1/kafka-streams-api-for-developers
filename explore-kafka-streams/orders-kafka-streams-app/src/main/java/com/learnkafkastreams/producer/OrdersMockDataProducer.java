@@ -26,20 +26,9 @@ public class OrdersMockDataProducer {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-       publishOrders(objectMapper, buildOrders());
-        //publishBulkOrders(objectMapper);
+      // publishOrders(objectMapper, buildOrders());
+        publishBulkOrders(objectMapper);
       //  publishOrdersForGracePeriod(objectMapper, buildOrders());
-        System.out.println(LocalDateTime.now(ZoneId.of("UTC")));
-        System.out.println(LocalDateTime.now());
-
-        var timeStamp = LocalDateTime.now();
-        //var timeStamp = LocalDateTime.now(ZoneId.of("UTC"));
-        System.out.println("timeStamp : " + timeStamp);
-
-        var instant = timeStamp.toEpochSecond(ZoneOffset.ofHours(-6));
-        System.out.println("instant : " + instant);
-        //System.out.println("toEpochMilli : " + instant.toEpochMilli());
-
 
     }
 
