@@ -12,8 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.learnkafkastreams.producer.ProducerUtil.publishMessageSync;
@@ -26,10 +25,118 @@ public class OrdersMockDataProducer {
         ObjectMapper objectMapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-      // publishOrders(objectMapper, buildOrders());
-        publishBulkOrders(objectMapper);
-      //  publishOrdersForGracePeriod(objectMapper, buildOrders());
+        // publishOrders(objectMapper, buildOrders());
+        //publishBulkOrders(objectMapper);
 
+        //grace-period
+
+        publishOrdersForGracePeriod(objectMapper, buildOrders());
+
+        //Future and Old Records
+//        publishFutureRecords(objectMapper);
+//        publishExpiredRecords(objectMapper);
+
+
+    }
+
+    private static void publishFutureRecords(ObjectMapper objectMapper) {
+        var localDateTime = LocalDateTime.now().plusDays(1);
+
+        var newOrders = buildOrders()
+                .stream()
+                .map(order ->
+                        new Order(order.orderId(),
+                                order.locationId(),
+                                order.finalAmount(),
+                                order.orderType(),
+                                order.orderLineItems(),
+                                localDateTime))
+                .toList();
+        publishOrders(objectMapper, newOrders);
+    }
+
+    private static void publishExpiredRecords(ObjectMapper objectMapper) {
+
+        var localDateTime = LocalDateTime.now().minusDays(1);
+
+        var newOrders = buildOrders()
+                .stream()
+                .map(order ->
+                        new Order(order.orderId(),
+                                order.locationId(),
+                                order.finalAmount(),
+                                order.orderType(),
+                                order.orderLineItems(),
+                                localDateTime))
+                .toList();
+        publishOrders(objectMapper, newOrders);
+
+    }
+
+    private static void publishOrdersForGracePeriod(ObjectMapper objectMapper, List<Order> orders) {
+
+        var localTime = LocalDateTime.now().toLocalTime();
+        var modifiedTime = LocalTime.of(localTime.getHour(), localTime.getMinute(), 18);
+        var localDateTime = LocalDateTime.now().with(modifiedTime);
+
+        //With Grace Period
+        //[general_orders_revenue_window]: , TotalRevenue[locationId=store_4567, runnuingOrderCount=1, runningRevenue=27.00]
+        //[general_orders_revenue_window]: TotalRevenue[locationId=store_1234, runnuingOrderCount=1, runningRevenue=27.00]
+        //[general_orders_revenue_window]:  TotalRevenue[locationId=store_4567, runnuingOrderCount=1, runningRevenue=27.00]
+        //[general_orders_revenue_window]:  TotalRevenue[locationId=store_4567, runnuingOrderCount=1, runningRevenue=27.00]
+
+        //Without Grace Period
+        //[general_orders_revenue_window]: , TotalRevenue[locationId=store_4567, runnuingOrderCount=1, runningRevenue=27.00]
+        //[general_orders_revenue_window]: TotalRevenue[locationId=store_1234, runnuingOrderCount=1, runningRevenue=27.00]
+        //[general_orders_revenue_window]:  TotalRevenue[locationId=store_4567, runnuingOrderCount=1, runningRevenue=27.00]
+        //[general_orders_revenue_window]:  TotalRevenue[locationId=store_4567, runnuingOrderCount=1, runningRevenue=27.00]
+
+
+
+        var generalOrdersWithCustomTime = orders
+                .stream()
+                .filter(order -> order.orderType().equals(OrderType.GENERAL))
+                .map(order ->
+                        new Order(order.orderId(),
+                                order.locationId(),
+                                order.finalAmount(),
+                                order.orderType(),
+                                order.orderLineItems(),
+                                localDateTime))
+                .toList();
+
+        var generalOrders = orders
+                .stream()
+                .filter(order -> order.orderType().equals(OrderType.GENERAL))
+                .toList();
+
+        publishOrders(objectMapper, generalOrders);
+
+        //orders with the timestamp as 18th second
+        publishRecordsWithDelay(generalOrdersWithCustomTime, localDateTime, objectMapper, 18);
+
+    }
+
+    private static void publishRecordsWithDelay(List<Order> newOrders, LocalDateTime localDateTime, ObjectMapper objectMapper) {
+
+        publishOrders(objectMapper, newOrders);
+    }
+
+    private static void publishRecordsWithDelay(List<Order> newOrders, LocalDateTime localDateTime, ObjectMapper objectMapper, int timeToPublish) {
+
+        var flag = true;
+        while (flag) {
+            var dateTime = LocalDateTime.now();
+            if (dateTime.toLocalTime().getMinute() == localDateTime.getMinute()
+                    && dateTime.toLocalTime().getSecond() == timeToPublish) {
+                System.out.printf("Publishing the record with delay ");
+                publishOrders(objectMapper, newOrders);
+                flag = false;
+            } else {
+                System.out.println(" Current Time is  and the record will be published at the 16th second: " + dateTime);
+                System.out.println("Record Date Time : " + localDateTime);
+            }
+        }
     }
 
     private static List<Order> buildOrdersForGracePeriod() {
@@ -152,5 +259,6 @@ public class OrdersMockDataProducer {
                     }
                 });
     }
+
 
 }

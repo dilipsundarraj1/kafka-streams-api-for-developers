@@ -147,8 +147,8 @@ public class OrdersTopology {
         Duration windowSize = Duration.ofSeconds(15);
         Duration graceWindowsSize = Duration.ofSeconds(5);
 
-        TimeWindows timeWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
-        //TimeWindows timeWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
+       // TimeWindows timeWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
+        TimeWindows timeWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
         Initializer<TotalRevenue> alphabetWordAggregateInitializer = TotalRevenue::new;
 
         Aggregator<String, Order, TotalRevenue> aggregator   = (key,order, totalRevenue )-> {
@@ -212,8 +212,8 @@ public class OrdersTopology {
         Duration windowSize = Duration.ofSeconds(15);
         Duration graceWindowsSize = Duration.ofSeconds(5);
 
-        TimeWindows timeWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
-        //TimeWindows timeWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
+        //TimeWindows timeWindow = TimeWindows.ofSizeWithNoGrace(windowSize);
+        TimeWindows timeWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
 
         var generalOrdersCount = generalOrdersStream
                 .map((key, value) -> KeyValue.pair(value.locationId(), value))

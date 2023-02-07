@@ -33,6 +33,7 @@ public class ExploreKTableTopology {
 
         wordsTable
                 .filter((key, value) -> value.length() > 2)
+                .mapValues((readOnlyKey, value) -> value.toUpperCase())
                 .toStream()
                 .peek(((key, value) -> log.info("Key : {} , value : {} ", key,value)))
                 .print(Printed.<String,String>toSysOut().withLabel("words-ktable"));
