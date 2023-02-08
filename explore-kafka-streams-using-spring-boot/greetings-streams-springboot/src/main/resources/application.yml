@@ -1,8 +1,8 @@
 spring:
-  main:
-      allow-bean-definition-overriding: true
   application:
     name: greeting-kafka-streams
+#  main:
+#      allow-bean-definition-overriding: true
   profiles:
     active: local # this activates the profile
 ---
@@ -24,6 +24,7 @@ spring:
           exception:
 #            handler: 'org.apache.kafka.streams.errors.LogAndContinueExceptionHandler'
 #            handler: 'com.learnkafkastreams.exceptionhandler.StreamsDeserializationErrorHandler'
-        serialization:
+        production:
           exception:
             handler: 'com.learnkafkastreams.exceptionhandler.StreamsSerializationExceptionHandler'
+

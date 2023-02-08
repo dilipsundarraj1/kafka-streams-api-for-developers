@@ -34,10 +34,10 @@ public class GreetingsStreamsTopology {
                 .mapValues((readOnlyKey, value) -> {
                     if(value.getMessage().equals("Error")){
                         try{
-                            throw new IllegalStateException("Error Occurred");
+                           // throw new IllegalStateException("Error Occurred");
                         }catch (Exception e){
                             log.error("Exception is : {} ", e.getMessage(), e);
-                            throw e;
+                           // throw e;
                         }
 
                     }

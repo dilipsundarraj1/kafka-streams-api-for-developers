@@ -26,7 +26,7 @@ public class OrdersKafkaStreamApp {
         var topology = OrdersTopology.buildTopology();
 
         Properties config = new Properties();
-        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "orders-app"); // consumer group
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "orders-app-2"); // consumer group
         config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // read only the new messages
         config.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, "5000"); // commit interval

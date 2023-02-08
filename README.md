@@ -107,3 +107,13 @@ docker exec -it broker bash
 ```
 kafka-topics --bootstrap-server localhost:9092 --list
 ```
+
+
+## KafkaStreams using SpringBoot 
+
+### How AutoConfiguration works ?
+
+- Adding the annotation @EnableKafkaStreams is going to invoke the **KafkaStreamsDefaultConfiguration** class
+  - **KafkaStreamsAnnotationDrivenConfiguration** supplies the **KafkaStreamsConfiguration** bean
+  - This class takes care of building the **StreamsBuilderFactoryBean** which is responsible for supplying the StreamsBuilder instance.
+      - This **StreamsBuilderFactoryBean** class also takes care of managing the Lifecycle of the **KafkaStreams** App.
