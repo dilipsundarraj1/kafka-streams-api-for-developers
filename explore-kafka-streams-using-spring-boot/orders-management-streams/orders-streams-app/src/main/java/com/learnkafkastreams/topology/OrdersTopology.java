@@ -69,11 +69,6 @@ public class OrdersTopology {
                 .split(Named.as("General-restaurant-stream"))
                 .branch(generalPredicate,
                         Branched.withConsumer(generalOrdersStream -> {
-//                            generalOrdersStream
-//                                    .mapValues((readOnlyKey, value) -> revenueMapper.apply(value))
-//                                    .to(GENERAL_ORDERS,
-//                                    //        Produced.with(Serdes.String(), SerdesFactory.orderSerdes())
-//                                            Produced.with(Serdes.String(), SerdesFactory.revenueSerdes())
 //                                    );
 
                             aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
