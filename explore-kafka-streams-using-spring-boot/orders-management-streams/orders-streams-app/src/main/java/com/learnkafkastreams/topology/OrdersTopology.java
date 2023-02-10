@@ -1,8 +1,14 @@
 package com.learnkafkastreams.topology;
 
+import com.learnkafkastreams.domain.Order;
+import com.learnkafkastreams.domain.Store;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.Printed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.support.serializer.JsonSerde;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +33,26 @@ public class OrdersTopology {
 
     @Autowired
     public void process(StreamsBuilder streamsBuilder) {
+
+        orderRopology(streamsBuilder);
+
+    }
+
+    private static void orderRopology(StreamsBuilder streamsBuilder) {
+        var orderStreams =  streamsBuilder.stream(ORDERS,
+                Consumed.with(Serdes.String(),new JsonSerde<Order>()));
+
+        var storesTable = streamsBuilder
+                .table(STORES,
+                        Consumed.with(Serdes.String(), new JsonSerde<>(Store.class)));
+
+        storesTable
+                .toStream()
+                .print(Printed.<String,Store>toSysOut().withLabel("stores"));
+
+        orderStreams
+                .print(Printed.<String, Order>toSysOut().withLabel("orders"));
+
 
     }
 }
