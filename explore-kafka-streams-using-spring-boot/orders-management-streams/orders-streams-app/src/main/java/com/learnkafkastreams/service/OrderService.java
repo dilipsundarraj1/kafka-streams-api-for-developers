@@ -1,13 +1,22 @@
 package com.learnkafkastreams.service;
 
+import com.learnkafkastreams.domain.AllOrdersCountPerStore;
 import com.learnkafkastreams.domain.OrderCountPerStore;
+import com.learnkafkastreams.domain.OrderType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Spliterators;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.learnkafkastreams.topology.OrdersTopology.*;
 
@@ -21,28 +30,32 @@ public class OrderService {
         this.orderStoreService = orderStoreService;
     }
 
-    public ArrayList<OrderCountPerStore> getOrdersCount(String orderType) {
+    public List<OrderCountPerStore> getOrdersCount(String orderType) {
 
         ReadOnlyKeyValueStore<String, Long> orderStore = getOrderStore(orderType);
 
-        var orderCountPerLocations = new ArrayList<OrderCountPerStore>();
-
         var orders = orderStore.all();
+        var spliterator = Spliterators.spliteratorUnknownSize(orders, 0);
+        return StreamSupport.stream(spliterator, false)
+                .map(keyValue ->
+                        new OrderCountPerStore(keyValue.key, keyValue.value))
+                .collect(Collectors.toList());
+    }
 
-        while (orders.hasNext()) {
-            var orderPerStore = orders.next();
-            orderCountPerLocations.add(new OrderCountPerStore(orderPerStore.key, orderPerStore.value));
+    public List<OrderCountPerStore> buildRecordsFromStore(KeyValueIterator<String, Long> orderStore) {
 
-        }
-        log.info("orderCountPerLocations : {}  ", orderCountPerLocations);
-        return orderCountPerLocations;
+        var spliterator = Spliterators.spliteratorUnknownSize(orderStore, 0);
+        return StreamSupport.stream(spliterator, false)
+                .map(keyValue ->
+                        new OrderCountPerStore(keyValue.key, keyValue.value))
+                .collect(Collectors.toList());
+
     }
 
     public OrderCountPerStore getOrdersCountByLocationId(String orderType, String locationId) {
 
         ReadOnlyKeyValueStore<String, Long> orderStore = getOrderStore(orderType);
         var orderCount = orderStore.get(locationId);
-
         if (orderCount != null) {
             return new OrderCountPerStore(locationId, orderCount);
         } else {
@@ -57,5 +70,31 @@ public class OrderService {
             case RESTAURANT_ORDERS -> orderStoreService.ordersCountStore(RESTAURANT_ORDERS_COUNT);
             default -> throw new IllegalStateException("Not a Valid Option");
         };
+    }
+
+    public List<AllOrdersCountPerStore> getAllOrdersCount() {
+
+        BiFunction<OrderCountPerStore, OrderType, AllOrdersCountPerStore> mapper
+                = (orderCountPerStore, orderType) -> new AllOrdersCountPerStore(orderCountPerStore.locationId(),
+                orderCountPerStore.orderCount(), orderType);
+
+
+        var generalOrders = orderStoreService.ordersCountStore(GENERAL_ORDERS_COUNT);
+        var restaurantOrders = orderStoreService.ordersCountStore(RESTAURANT_ORDERS_COUNT);
+        var generalOrdersCount =
+                buildRecordsFromStore(generalOrders.all())
+                        .stream()
+                        .map(orderCountPerStore -> mapper.apply(orderCountPerStore, OrderType.GENERAL))
+                        .collect(Collectors.toList());
+
+        var restaurantOrdersCount = buildRecordsFromStore(restaurantOrders.all())
+                .stream()
+                .map(orderCountPerStore -> mapper.apply(orderCountPerStore, OrderType.RESTAURANT))
+                .toList();
+
+         generalOrdersCount
+                .addAll(restaurantOrdersCount);
+         return generalOrdersCount;
+
     }
 }

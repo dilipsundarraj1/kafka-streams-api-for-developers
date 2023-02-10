@@ -1,5 +1,6 @@
 package com.learnkafkastreams.controller;
 
+import com.learnkafkastreams.domain.AllOrdersCountPerStore;
 import com.learnkafkastreams.domain.OrderCountPerStore;
 import com.learnkafkastreams.service.OrderService;
 import com.learnkafkastreams.service.OrderStoreService;
@@ -33,7 +34,13 @@ public class OrdersController {
             return ResponseEntity.ok(orderService.getOrdersCount(orderType));
 
         }
+    }
 
+    @GetMapping("/count")
+    public List<AllOrdersCountPerStore> allOrdersCount(
+    ) {
+        return orderService.getAllOrdersCount();
 
     }
+
 }
