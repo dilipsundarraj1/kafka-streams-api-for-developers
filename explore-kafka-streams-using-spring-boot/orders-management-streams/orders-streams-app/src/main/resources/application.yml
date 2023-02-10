@@ -2,7 +2,7 @@ spring:
   main:
       allow-bean-definition-overriding: true
   application:
-    name: greeting-kafka-streams
+    name: orders-kafka-streams
   profiles:
     active: local # this activates the profile
 ---
@@ -13,7 +13,7 @@ spring:
   kafka:
     streams:
       bootstrap-servers: localhost:9092
-      application-id: greeting-streams-springboot
+      application-id: orders-kafka-streams
     properties:
       default:
         key:
