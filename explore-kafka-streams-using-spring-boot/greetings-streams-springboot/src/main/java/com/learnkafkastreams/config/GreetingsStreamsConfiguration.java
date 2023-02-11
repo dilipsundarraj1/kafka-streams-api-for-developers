@@ -1,5 +1,8 @@
 package com.learnkafkastreams.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.learnkafkastreams.exceptionhandler.StreamsProcessorCustomErrorHandler;
 import com.learnkafkastreams.topology.GreetingsStreamsTopology;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,15 @@ public class GreetingsStreamsConfiguration {
 
     @Autowired
     KafkaTemplate<String, String> kafkaTemplate;
+
+
+    @Bean
+    public ObjectMapper objectMapper(){
+
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    }
 
     @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
     public KafkaStreamsConfiguration kStreamConfig() {
