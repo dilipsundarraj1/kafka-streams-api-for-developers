@@ -1,12 +1,32 @@
-Retrieve Orders Count By Type:
-============================
+===============================
+Retrieve Orders Count By Type: |
+===============================
 curl -i http://localhost:8080/v1/orders/count/general_orders
 
 curl -i http://localhost:8080/v1/orders/count/general_orders?location_id=store_1234
 
 curl -i http://localhost:8080/v1/orders/count/restaurant_orders
 
-Retrieve All Orders Count for All Types:
-========================================
+=========================================
+Retrieve All Orders Count for All Types: |
+=========================================
 
 curl -i http://localhost:8080/v1/orders/count
+
+=========
+WINDOWS:|
+=========
+
+===================================================
+Retrieve All Orders Count for All Types By Windows:|
+===================================================
+
+curl -i http://localhost:8080/v1/orders/windows
+
+===================================================
+Retrieve All Orders Count for  Windows by Order Type:|
+===================================================
+
+curl -i http://localhost:8080/v1/orders/windows/restaurant_orders_count_window
+
+curl -i http://localhost:8080/v1/orders/windows/general_orders_count_window

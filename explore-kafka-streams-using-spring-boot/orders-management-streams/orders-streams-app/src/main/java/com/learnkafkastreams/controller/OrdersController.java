@@ -1,6 +1,7 @@
 package com.learnkafkastreams.controller;
 
 import com.learnkafkastreams.domain.AllOrdersCountPerStore;
+import com.learnkafkastreams.domain.AllOrdersCountPerStoreByWindows;
 import com.learnkafkastreams.domain.OrderCountPerStore;
 import com.learnkafkastreams.service.OrderService;
 import com.learnkafkastreams.service.OrderStoreService;
@@ -40,6 +41,21 @@ public class OrdersController {
     public List<AllOrdersCountPerStore> allOrdersCount(
     ) {
         return orderService.getAllOrdersCount();
+
+    }
+
+    @GetMapping("/windows")
+    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows(
+    ) {
+        return orderService.getAllOrdersCountByWindows();
+
+    }
+
+    @GetMapping("/windows/{window_order_type}")
+    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
+            @PathVariable("window_order_type") String orderType
+    ) {
+        return orderService.getAllOrdersCountWindowsByType(orderType);
 
     }
 

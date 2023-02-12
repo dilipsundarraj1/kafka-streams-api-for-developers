@@ -74,8 +74,8 @@ public class OrdersTopology {
 //                                    );
 
                             aggregateOrdersByCount(generalOrdersStream, GENERAL_ORDERS_COUNT);
-                            //aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
-                            aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
+                            aggregateOrdersCountByTimeWindows(generalOrdersStream, GENERAL_ORDERS_COUNT_WINDOWS);
+                           // aggregateOrdersByRevenue(generalOrdersStream, GENERAL_ORDERS_REVENUE, storesTable);
                             //aggregateOrdersRevenueByWindows(generalOrdersStream, GENERAL_ORDERS_REVENUE_WINDOWS, storesTable);
 
                         }))
@@ -89,10 +89,9 @@ public class OrdersTopology {
 //                                    );
 
                             aggregateOrdersByCount(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT);
-                            // aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
-
-                            aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
-                            aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
+                             aggregateOrdersCountByTimeWindows(restaurantOrdersStream, RESTAURANT_ORDERS_COUNT_WINDOWS);
+                           // aggregateOrdersByRevenue(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE, storesTable);
+                          //  aggregateOrdersRevenueByWindows(restaurantOrdersStream, RESTAURANT_ORDERS_REVENUE_WINDOWS, storesTable);
                         }));
 
     }
@@ -203,7 +202,7 @@ public class OrdersTopology {
                 .map((key, value) -> KeyValue.pair(value.locationId(), value))
                 .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(Order.class)))
                 .windowedBy(hoppingWindow)
-                .count(Named.as(storeName))
+                .count(Named.as(storeName), Materialized.as(storeName))
                 .suppress(Suppressed
                         .untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull())
                 );
