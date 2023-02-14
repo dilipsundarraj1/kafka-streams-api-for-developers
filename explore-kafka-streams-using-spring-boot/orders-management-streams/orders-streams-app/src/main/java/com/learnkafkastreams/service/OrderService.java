@@ -5,6 +5,7 @@ import com.learnkafkastreams.domain.AllOrdersCountPerStoreByWindows;
 import com.learnkafkastreams.domain.OrderCountPerStore;
 import com.learnkafkastreams.domain.OrderType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.streams.kstream.Windowed;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Spliterators;
@@ -103,37 +105,13 @@ public class OrderService {
 
     public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows() {
 
-        var ordersCountByWindows = orderStoreService
-               // .ordersWindowCountStore(GENERAL_ORDERS_COUNT_WINDOWS)
-                .ordersWindowCountStore(RESTAURANT_ORDERS_COUNT_WINDOWS)
-                .all();
+        var generalOrdersCountByWindows =  getAllOrdersCountWindowsByType(GENERAL_ORDERS_COUNT_WINDOWS);
 
-        var spliterator = Spliterators.spliteratorUnknownSize(ordersCountByWindows, 0);
+        var restaurantOrdersCountByWindows =  getAllOrdersCountWindowsByType(RESTAURANT_ORDERS_COUNT_WINDOWS);
 
-//        return StreamSupport.stream(spliterator, false)
-//                .map(keyValue ->
-//                        new OrderCountPerStore(keyValue.key, keyValue.value))
-//                .collect(Collectors.toList());
+        generalOrdersCountByWindows.addAll(restaurantOrdersCountByWindows);
 
-     var generalOrdersByWindows =    StreamSupport.stream(spliterator, false)
-                .map(windowedLongKeyValue -> {
-                    log.info("Start time : {}  , endTime : {}" , windowedLongKeyValue.key.window().startTime(),
-                            windowedLongKeyValue.key.window().endTime());
-                   return new AllOrdersCountPerStoreByWindows(
-                            windowedLongKeyValue.key.key(),
-                            windowedLongKeyValue.value,
-                            OrderType.GENERAL,
-                            LocalDateTime.ofInstant(windowedLongKeyValue.key.window().startTime(),
-                                    ZoneId.of(ZoneId.SHORT_IDS.get("GMT"))),
-                            LocalDateTime.ofInstant(windowedLongKeyValue.key.window().endTime(),
-                                    ZoneId.of(ZoneId.SHORT_IDS.get("GMT")))
-
-                    );
-                })
-             .collect(Collectors.toList());
-
-        return generalOrdersByWindows;
-
+        return generalOrdersCountByWindows;
 
     }
 
@@ -145,16 +123,15 @@ public class OrderService {
 
         var generalOrdersByWindows =    StreamSupport.stream(spliterator, false)
                 .map(windowedLongKeyValue -> {
-                    log.info("Start time : {}  , endTime : {}" , windowedLongKeyValue.key.window().startTime(),
-                            windowedLongKeyValue.key.window().endTime());
+                    printLocalDateTimes(windowedLongKeyValue.key, windowedLongKeyValue.value);
                     return new AllOrdersCountPerStoreByWindows(
                             windowedLongKeyValue.key.key(),
                             windowedLongKeyValue.value,
                             OrderType.GENERAL,
                             LocalDateTime.ofInstant(windowedLongKeyValue.key.window().startTime(),
-                                    ZoneId.of(ZoneId.SHORT_IDS.get("GMT"))),
+                                    ZoneId.of("GMT")),
                             LocalDateTime.ofInstant(windowedLongKeyValue.key.window().endTime(),
-                                    ZoneId.of(ZoneId.SHORT_IDS.get("GMT")))
+                                    ZoneId.of("GMT"))
 
                     );
                 })
@@ -163,4 +140,5 @@ public class OrderService {
         return generalOrdersByWindows;
 
     }
+
 }

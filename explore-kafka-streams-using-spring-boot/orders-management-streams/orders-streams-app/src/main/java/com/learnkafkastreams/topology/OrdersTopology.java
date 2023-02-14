@@ -217,7 +217,7 @@ public class OrdersTopology {
 
     }
 
-    private static void printLocalDateTimes(Windowed<String> key, Object value) {
+    public static void printLocalDateTimes(Windowed<String> key, Object value) {
         var startTime = key.window().startTime();
         var endTime = key.window().endTime();
         log.info("startTime : {} , endTime : {}, Count : {}", startTime, endTime, value);
