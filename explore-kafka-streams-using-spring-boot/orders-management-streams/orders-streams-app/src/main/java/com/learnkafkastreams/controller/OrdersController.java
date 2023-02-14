@@ -2,14 +2,15 @@ package com.learnkafkastreams.controller;
 
 import com.learnkafkastreams.domain.AllOrdersCountPerStore;
 import com.learnkafkastreams.domain.AllOrdersCountPerStoreByWindows;
-import com.learnkafkastreams.domain.OrderCountPerStore;
+import com.learnkafkastreams.domain.OrderType;
 import com.learnkafkastreams.service.OrderService;
-import com.learnkafkastreams.service.OrderStoreService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -46,7 +47,17 @@ public class OrdersController {
 
     @GetMapping("/windows")
     public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows(
+            @RequestParam(value = "from_time", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime fromTime,
+            @RequestParam(value = "to_time", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime toTime
     ) {
+        log.info("fromTime : {} , toTime : {}", fromTime, toTime);
+        if(fromTime!=null && toTime!=null){
+            return orderService.getAllOrdersCountByWindows(fromTime, toTime);
+        }
         return orderService.getAllOrdersCountByWindows();
 
     }
@@ -55,7 +66,7 @@ public class OrdersController {
     public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
             @PathVariable("window_order_type") String orderType
     ) {
-        return orderService.getAllOrdersCountWindowsByType(orderType);
+        return orderService.getAllOrdersCountWindowsByType(orderType, OrderType.RESTAURANT);
 
     }
 

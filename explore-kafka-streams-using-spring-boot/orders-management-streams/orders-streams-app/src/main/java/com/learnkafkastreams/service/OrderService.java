@@ -9,15 +9,11 @@ import org.apache.kafka.streams.kstream.Windowed;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -97,37 +93,40 @@ public class OrderService {
                 .map(orderCountPerStore -> mapper.apply(orderCountPerStore, OrderType.RESTAURANT))
                 .toList();
 
-         generalOrdersCount
+        generalOrdersCount
                 .addAll(restaurantOrdersCount);
-         return generalOrdersCount;
+        return generalOrdersCount;
 
     }
 
     public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows() {
 
-        var generalOrdersCountByWindows =  getAllOrdersCountWindowsByType(GENERAL_ORDERS_COUNT_WINDOWS);
+        var generalOrdersCountByWindows = getAllOrdersCountWindowsByType(GENERAL_ORDERS_COUNT_WINDOWS, OrderType.GENERAL);
 
-        var restaurantOrdersCountByWindows =  getAllOrdersCountWindowsByType(RESTAURANT_ORDERS_COUNT_WINDOWS);
+        var restaurantOrdersCountByWindows = getAllOrdersCountWindowsByType(RESTAURANT_ORDERS_COUNT_WINDOWS, OrderType.RESTAURANT);
 
-        generalOrdersCountByWindows.addAll(restaurantOrdersCountByWindows);
-
-        return generalOrdersCountByWindows;
-
+        return Stream.of(generalOrdersCountByWindows, restaurantOrdersCountByWindows)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
-    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String orderType) {
+    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName, OrderType orderType) {
         var ordersCountByWindows = orderStoreService
-                .ordersWindowCountStore(orderType)
+                .ordersWindowCountStore(storeName)
                 .all();
-        var spliterator = Spliterators.spliteratorUnknownSize(ordersCountByWindows, 0);
 
-        var generalOrdersByWindows =    StreamSupport.stream(spliterator, false)
+        return mapToAllOrderCountPerStoreByWindows(ordersCountByWindows, orderType);
+    }
+
+    private static List<AllOrdersCountPerStoreByWindows> mapToAllOrderCountPerStoreByWindows(KeyValueIterator<Windowed<String>, Long> ordersCountByWindows, OrderType orderType) {
+        var spliterator = Spliterators.spliteratorUnknownSize(ordersCountByWindows, 0);
+        return StreamSupport.stream(spliterator, false)
                 .map(windowedLongKeyValue -> {
                     printLocalDateTimes(windowedLongKeyValue.key, windowedLongKeyValue.value);
                     return new AllOrdersCountPerStoreByWindows(
                             windowedLongKeyValue.key.key(),
                             windowedLongKeyValue.value,
-                            OrderType.GENERAL,
+                            orderType,
                             LocalDateTime.ofInstant(windowedLongKeyValue.key.window().startTime(),
                                     ZoneId.of("GMT")),
                             LocalDateTime.ofInstant(windowedLongKeyValue.key.window().endTime(),
@@ -136,9 +135,30 @@ public class OrderService {
                     );
                 })
                 .toList();
-
-        return generalOrdersByWindows;
-
     }
 
+    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows(LocalDateTime fromTime, LocalDateTime toTime) {
+
+        var fromTimeInstant = fromTime.toInstant(ZoneOffset.UTC);
+        var toTimeInstant = toTime.toInstant(ZoneOffset.UTC);
+
+        log.info("fromTimeInstant : {} , toTimeInstant : {} ", fromTimeInstant, toTimeInstant);
+
+        var generalOrdersCountByWindows = orderStoreService
+                .ordersWindowCountStore(GENERAL_ORDERS_COUNT_WINDOWS)
+                .fetchAll(fromTimeInstant, toTimeInstant);
+
+        var generalAllOrderCountPerStoreByWindows = mapToAllOrderCountPerStoreByWindows(generalOrdersCountByWindows, OrderType.GENERAL);
+
+        var restaurantOrdersCountByWindows = orderStoreService
+                .ordersWindowCountStore(RESTAURANT_ORDERS_COUNT_WINDOWS)
+                .fetchAll(fromTimeInstant, toTimeInstant);
+        var restaurantOrderCountPerStoreByWindows = mapToAllOrderCountPerStoreByWindows(restaurantOrdersCountByWindows, OrderType.RESTAURANT);
+
+        return Stream.of(generalAllOrderCountPerStoreByWindows, restaurantOrderCountPerStoreByWindows)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+
+    }
 }
