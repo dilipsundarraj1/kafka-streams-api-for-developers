@@ -1,5 +1,7 @@
 package com.learnkafkastreams.service;
 
+import com.learnkafkastreams.domain.TotalRevenue;
+import com.learnkafkastreams.domain.TotalRevenueWithAddress;
 import org.apache.kafka.streams.StoreQueryParameters;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
@@ -16,6 +18,17 @@ public class OrderStoreService {
     }
 
     public ReadOnlyKeyValueStore<String, Long> ordersCountStore(String storeName){
+
+        return streamsBuilderFactoryBean.getKafkaStreams()
+                .store(StoreQueryParameters.fromNameAndType(
+                        // state store name
+                        storeName,
+                        // state store type
+                        QueryableStoreTypes.keyValueStore()));
+
+    }
+
+    public ReadOnlyKeyValueStore<String, TotalRevenue> ordersRevenueWithAddressStore(String storeName){
 
         return streamsBuilderFactoryBean.getKafkaStreams()
                 .store(StoreQueryParameters.fromNameAndType(

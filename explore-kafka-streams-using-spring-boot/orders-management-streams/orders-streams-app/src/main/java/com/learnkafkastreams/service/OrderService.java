@@ -1,9 +1,6 @@
 package com.learnkafkastreams.service;
 
-import com.learnkafkastreams.domain.AllOrdersCountPerStore;
-import com.learnkafkastreams.domain.AllOrdersCountPerStoreByWindows;
-import com.learnkafkastreams.domain.OrderCountPerStore;
-import com.learnkafkastreams.domain.OrderType;
+import com.learnkafkastreams.domain.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.kstream.Windowed;
 import org.apache.kafka.streams.state.KeyValueIterator;
@@ -69,6 +66,15 @@ public class OrderService {
         return switch (orderType) {
             case GENERAL_ORDERS -> orderStoreService.ordersCountStore(GENERAL_ORDERS_COUNT);
             case RESTAURANT_ORDERS -> orderStoreService.ordersCountStore(RESTAURANT_ORDERS_COUNT);
+            default -> throw new IllegalStateException("Not a Valid Option");
+        };
+    }
+
+    private ReadOnlyKeyValueStore<String, TotalRevenue> getRevenueStore(String orderType) {
+
+        return switch (orderType) {
+            case GENERAL_ORDERS -> orderStoreService.ordersRevenueWithAddressStore(GENERAL_ORDERS_REVENUE);
+            case RESTAURANT_ORDERS -> orderStoreService.ordersRevenueWithAddressStore(RESTAURANT_ORDERS_REVENUE);
             default -> throw new IllegalStateException("Not a Valid Option");
         };
     }
@@ -159,6 +165,38 @@ public class OrderService {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
+
+    }
+
+    public List<OrderRevenuePerStore> revenueByOrderType(String orderType) {
+
+        var revenueStoreByType =getRevenueStore(orderType);
+
+        var revenueWithAddress = revenueStoreByType.all();
+        var spliterator = Spliterators.spliteratorUnknownSize(revenueWithAddress, 0);
+        return StreamSupport.stream(spliterator, false)
+                .map(keyValue ->
+                        new OrderRevenuePerStore(keyValue.key, mapOrderType(orderType), keyValue.value))
+                .collect(Collectors.toList());
+
+    }
+
+    private OrderType mapOrderType(String orderType) {
+        return switch (orderType) {
+            case GENERAL_ORDERS -> OrderType.GENERAL;
+            case RESTAURANT_ORDERS -> OrderType.RESTAURANT;
+            default -> throw new IllegalStateException("Not a Valid Option");
+        };
+    }
+
+    public List<OrderRevenuePerStore> allRevenue() {
+
+        var generalOrdersRevenue =revenueByOrderType(GENERAL_ORDERS);
+        var restaurantOrdersRevenue =revenueByOrderType(RESTAURANT_ORDERS);
+
+        return Stream.of(generalOrdersRevenue, restaurantOrdersRevenue)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
 
     }
 }

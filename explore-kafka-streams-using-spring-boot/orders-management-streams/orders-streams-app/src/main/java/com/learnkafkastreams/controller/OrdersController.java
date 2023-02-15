@@ -1,8 +1,6 @@
 package com.learnkafkastreams.controller;
 
-import com.learnkafkastreams.domain.AllOrdersCountPerStore;
-import com.learnkafkastreams.domain.AllOrdersCountPerStoreByWindows;
-import com.learnkafkastreams.domain.OrderType;
+import com.learnkafkastreams.domain.*;
 import com.learnkafkastreams.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -38,6 +36,25 @@ public class OrdersController {
         }
     }
 
+    @GetMapping("/revenue/{order_type}")
+    public ResponseEntity<?> revenueByOrderType(
+            @PathVariable("order_type") String orderType,
+            @RequestParam(value = "location_id", required = false) String locationId
+    ) {
+        if (StringUtils.hasLength(locationId)) {
+            return ResponseEntity.ok(orderService.getOrdersCountByLocationId(orderType, locationId));
+        } else {
+
+            return ResponseEntity.ok(orderService.revenueByOrderType(orderType));
+
+        }
+    }
+
+    @GetMapping("/revenue")
+    public List<OrderRevenuePerStore> allRevenue() {
+        return orderService.allRevenue();
+    }
+
     @GetMapping("/count")
     public List<AllOrdersCountPerStore> allOrdersCount(
     ) {
@@ -55,7 +72,7 @@ public class OrdersController {
             LocalDateTime toTime
     ) {
         log.info("fromTime : {} , toTime : {}", fromTime, toTime);
-        if(fromTime!=null && toTime!=null){
+        if (fromTime != null && toTime != null) {
             return orderService.getAllOrdersCountByWindows(fromTime, toTime);
         }
         return orderService.getAllOrdersCountByWindows();
