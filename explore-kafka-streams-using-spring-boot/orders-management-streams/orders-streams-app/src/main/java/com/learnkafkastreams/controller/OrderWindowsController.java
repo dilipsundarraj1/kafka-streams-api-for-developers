@@ -1,6 +1,7 @@
 package com.learnkafkastreams.controller;
 
 import com.learnkafkastreams.domain.OrdersCountPerStoreByWindows;
+import com.learnkafkastreams.domain.OrdersRevenuePerStoreByWindows;
 import com.learnkafkastreams.service.OrdersWindowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +21,15 @@ public class OrderWindowsController {
         this.ordersWindowService = ordersWindowService;
     }
 
+
+    @GetMapping("/windows/count/{window_order_type}")
+    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
+            @PathVariable("window_order_type") String orderType
+    ) {
+        return ordersWindowService.getAllOrdersCountWindowsByType(orderType);
+
+    }
+
     @GetMapping("/windows/count")
     public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows(
             @RequestParam(value = "from_time", required = false)
@@ -37,12 +47,14 @@ public class OrderWindowsController {
 
     }
 
-    @GetMapping("/windows/count/{window_order_type}")
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
+    @GetMapping("/windows/revenue/{window_order_type}")
+    public List<OrdersRevenuePerStoreByWindows> getAllOrdersRevenueByWindowsType(
             @PathVariable("window_order_type") String orderType
     ) {
-        return ordersWindowService.getAllOrdersCountWindowsByType(orderType);
+        return ordersWindowService.getAllOrdersRevenueWindowsByType(orderType);
 
     }
+
+
 
 }
