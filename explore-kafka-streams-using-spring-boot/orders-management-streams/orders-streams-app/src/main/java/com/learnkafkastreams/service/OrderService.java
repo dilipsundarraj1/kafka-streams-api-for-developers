@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.kstream.Windowed;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
+import org.apache.kafka.streams.state.ReadOnlyWindowStore;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -116,6 +117,8 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+
+
     public List<OrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName, OrderType orderType) {
         var ordersCountByWindows = orderStoreService
                 .ordersWindowCountStore(storeName)
@@ -181,8 +184,8 @@ public class OrderService {
 
     }
 
-    private OrderType mapOrderType(String storeName) {
-        return switch (storeName) {
+    private OrderType mapOrderType(String orderType) {
+        return switch (orderType) {
             case GENERAL_ORDERS -> OrderType.GENERAL;
             case RESTAURANT_ORDERS -> OrderType.RESTAURANT;
             default -> throw new IllegalStateException("Not a Valid Option");
@@ -200,9 +203,5 @@ public class OrderService {
 
     }
 
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName) {
-        var orderEnum = mapOrderType(storeName);
-        return getAllOrdersCountWindowsByType(storeName, orderEnum);
 
-    }
 }

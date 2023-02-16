@@ -52,9 +52,9 @@ curl -i http://localhost:8080/v1/orders/windows/count
 Retrieve All Orders Count for  Windows by Order Type:|
 ===================================================
 
-curl -i http://localhost:8080/v1/orders/windows/count/restaurant_orders_count_window
+curl -i http://localhost:8080/v1/orders/windows/count/restaurant_orders
 
-curl -i http://localhost:8080/v1/orders/windows/count/general_orders_count_window
+curl -i http://localhost:8080/v1/orders/windows/count/general_orders
 
 
 ==========================================================================
@@ -63,7 +63,4 @@ Retrieve All Orders Count for  Windows by passing custom from and to time:|
 
 // to_times are inclusive:
 Example: to_time=2023-02-14T11:33:30Z, If there is a start window with this value then it gets included in the fetched result.
-curl -i http://localhost:8080/v1/orders/windows/count?from_time=2023-02-14T11:33:00Z&to_time=2023-02-14T11:33:30Z
-
-curl -i http://localhost:8080/v1/orders/windows/count?from_time=2023-02-14T11:33:00Z&to_time=2023-02-14T11:33:29Z
-
+curl -i http://localhost:8080/v1/orders/windows/count?from_time=2023-02-15T02:18:00&to_time=2023-02-15T02:18:30

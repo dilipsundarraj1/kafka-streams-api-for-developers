@@ -62,29 +62,29 @@ public class OrdersController {
 
     }
 
-    @GetMapping("/windows/count")
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows(
-            @RequestParam(value = "from_time", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime fromTime,
-            @RequestParam(value = "to_time", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime toTime
-    ) {
-        log.info("fromTime : {} , toTime : {}", fromTime, toTime);
-        if (fromTime != null && toTime != null) {
-            return orderService.getAllOrdersCountByWindows(fromTime, toTime);
-        }
-        return orderService.getAllOrdersCountByWindows();
-
-    }
-
-    @GetMapping("/windows/count/{window_order_type}")
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
-            @PathVariable("window_order_type") String storeName
-    ) {
-        return orderService.getAllOrdersCountWindowsByType(storeName);
-
-    }
+//    @GetMapping("/windows/count")
+//    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows(
+//            @RequestParam(value = "from_time", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+//            LocalDateTime fromTime,
+//            @RequestParam(value = "to_time", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+//            LocalDateTime toTime
+//    ) {
+//        log.info("fromTime : {} , toTime : {}", fromTime, toTime);
+//        if (fromTime != null && toTime != null) {
+//            return orderService.getAllOrdersCountByWindows(fromTime, toTime);
+//        }
+//        return orderService.getAllOrdersCountByWindows();
+//
+//    }
+//
+//    @GetMapping("/windows/count/{window_order_type}")
+//    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
+//            @PathVariable("window_order_type") String orderType
+//    ) {
+//        return orderService.getAllOrdersCountWindowsByType(orderType);
+//
+//    }
 
 }
