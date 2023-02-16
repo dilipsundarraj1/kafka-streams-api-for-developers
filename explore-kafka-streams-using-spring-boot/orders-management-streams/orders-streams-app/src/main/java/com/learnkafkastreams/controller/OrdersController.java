@@ -49,7 +49,7 @@ public class OrdersController {
     }
 
     @GetMapping("/revenue")
-    public List<OrderRevenuePerStore> allRevenue() {
+    public List<OrderRevenueDTO> allRevenue() {
         return orderService.allRevenue();
     }
 

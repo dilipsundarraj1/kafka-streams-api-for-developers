@@ -1,0 +1,20 @@
+[
+  {
+    "locationId": "store_1234",
+    "orderType": "GENERAL",
+    "totalRevenue": {
+      "locationId": "store_1234",
+      "runnuingOrderCount": 200,
+      "runningRevenue": 5400.00
+    }
+  },
+  {
+    "locationId": "store_4567",
+    "orderType": "GENERAL",
+    "totalRevenue": {
+      "locationId": "store_4567",
+      "runnuingOrderCount": 200,
+      "runningRevenue": 5400.00
+    }
+  }
+]

@@ -170,7 +170,7 @@ public class OrderService {
 
     }
 
-    public List<OrderRevenuePerStore> revenueByOrderType(String orderType) {
+    public List<OrderRevenueDTO> revenueByOrderType(String orderType) {
 
         var revenueStoreByType =getRevenueStore(orderType);
 
@@ -178,7 +178,7 @@ public class OrderService {
         var spliterator = Spliterators.spliteratorUnknownSize(revenueWithAddress, 0);
         return StreamSupport.stream(spliterator, false)
                 .map(keyValue ->
-                        new OrderRevenuePerStore(keyValue.key, mapOrderType(orderType), keyValue.value))
+                        new OrderRevenueDTO(keyValue.key, mapOrderType(orderType), keyValue.value))
                 .collect(Collectors.toList());
 
     }
@@ -191,7 +191,7 @@ public class OrderService {
         };
     }
 
-    public List<OrderRevenuePerStore> allRevenue() {
+    public List<OrderRevenueDTO> allRevenue() {
 
         var generalOrdersRevenue =revenueByOrderType(GENERAL_ORDERS);
         var restaurantOrdersRevenue =revenueByOrderType(RESTAURANT_ORDERS);

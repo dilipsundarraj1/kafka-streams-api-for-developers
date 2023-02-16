@@ -1,6 +1,6 @@
 package com.learnkafkastreams.domain;
 
-public record OrderRevenuePerStore(
+public record OrderRevenueDTO(
         String locationId,
 
         OrderType orderType,
