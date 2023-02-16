@@ -2,6 +2,7 @@ package com.learnkafkastreams.topology;
 
 import com.learnkafkastreams.domain.Order;
 import com.learnkafkastreams.domain.Store;
+import com.learnkafkastreams.util.OrderTimeStampExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -39,8 +40,12 @@ public class OrdersTopology {
     }
 
     private static void orderRopology(StreamsBuilder streamsBuilder) {
-        var orderStreams =  streamsBuilder.stream(ORDERS,
-                Consumed.with(Serdes.String(),new JsonSerde<Order>()));
+        var orderStreams = streamsBuilder
+                .stream(ORDERS,
+                        Consumed.with(Serdes.String(), new JsonSerde<>(Order.class))
+                                .withTimestampExtractor(new OrderTimeStampExtractor())
+                )
+                .selectKey((key, value) -> value.locationId());
 
         var storesTable = streamsBuilder
                 .table(STORES,
