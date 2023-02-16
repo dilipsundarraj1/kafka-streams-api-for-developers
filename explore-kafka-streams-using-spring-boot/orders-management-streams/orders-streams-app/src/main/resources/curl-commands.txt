@@ -1,15 +1,22 @@
 ===============================
 Retrieve Orders Count By Order Type: |
 ===============================
+
 curl -i http://localhost:8080/v1/orders/count/general_orders
 
 curl -i http://localhost:8080/v1/orders/count/restaurant_orders
+
+Sample JSON: 01-orders-count.json
+DTO:OrderCountPerStoreDTO
 
 ===================================================
 Retrieve Orders Count By Order Type & Location Id: |
 ===================================================
 
 curl -i http://localhost:8080/v1/orders/count/general_orders?location_id=store_1234
+
+Sample JSON: 02-orders-count-by-locationid.json
+DTO: OrderCountPerStoreDTO
 
 No Matching Key:
 ================
@@ -22,6 +29,8 @@ Retrieve All Orders Count for All Types: |
 
 curl -i http://localhost:8080/v1/orders/count
 
+Sample JSON : 03-count-with-all-orders-types.json
+DTO: AllOrdersCountPerStoreDTO
 
 =========================
 Retrieve Revenue By Order Type:|

@@ -1,0 +1,22 @@
+[
+  {
+    "locationId": "store_1234",
+    "orderCount": 726,
+    "orderType": "GENERAL"
+  },
+  {
+    "locationId": "store_4567",
+    "orderCount": 726,
+    "orderType": "GENERAL"
+  },
+  {
+    "locationId": "store_1234",
+    "orderCount": 726,
+    "orderType": "RESTAURANT"
+  },
+  {
+    "locationId": "store_4567",
+    "orderCount": 726,
+    "orderType": "RESTAURANT"
+  }
+]
