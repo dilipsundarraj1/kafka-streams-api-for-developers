@@ -105,7 +105,7 @@ public class OrderService {
 
     }
 
-    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows() {
+    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows() {
 
         var generalOrdersCountByWindows = getAllOrdersCountWindowsByType(GENERAL_ORDERS_COUNT_WINDOWS, OrderType.GENERAL);
 
@@ -116,7 +116,7 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
-    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName, OrderType orderType) {
+    public List<OrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName, OrderType orderType) {
         var ordersCountByWindows = orderStoreService
                 .ordersWindowCountStore(storeName)
                 .all();
@@ -124,12 +124,12 @@ public class OrderService {
         return mapToAllOrderCountPerStoreByWindows(ordersCountByWindows, orderType);
     }
 
-    private static List<AllOrdersCountPerStoreByWindows> mapToAllOrderCountPerStoreByWindows(KeyValueIterator<Windowed<String>, Long> ordersCountByWindows, OrderType orderType) {
+    private static List<OrdersCountPerStoreByWindows> mapToAllOrderCountPerStoreByWindows(KeyValueIterator<Windowed<String>, Long> ordersCountByWindows, OrderType orderType) {
         var spliterator = Spliterators.spliteratorUnknownSize(ordersCountByWindows, 0);
         return StreamSupport.stream(spliterator, false)
                 .map(windowedLongKeyValue -> {
                     printLocalDateTimes(windowedLongKeyValue.key, windowedLongKeyValue.value);
-                    return new AllOrdersCountPerStoreByWindows(
+                    return new OrdersCountPerStoreByWindows(
                             windowedLongKeyValue.key.key(),
                             windowedLongKeyValue.value,
                             orderType,
@@ -143,7 +143,7 @@ public class OrderService {
                 .toList();
     }
 
-    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows(LocalDateTime fromTime, LocalDateTime toTime) {
+    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows(LocalDateTime fromTime, LocalDateTime toTime) {
 
         var fromTimeInstant = fromTime.toInstant(ZoneOffset.UTC);
         var toTimeInstant = toTime.toInstant(ZoneOffset.UTC);
@@ -181,8 +181,8 @@ public class OrderService {
 
     }
 
-    private OrderType mapOrderType(String orderType) {
-        return switch (orderType) {
+    private OrderType mapOrderType(String storeName) {
+        return switch (storeName) {
             case GENERAL_ORDERS -> OrderType.GENERAL;
             case RESTAURANT_ORDERS -> OrderType.RESTAURANT;
             default -> throw new IllegalStateException("Not a Valid Option");
@@ -197,6 +197,12 @@ public class OrderService {
         return Stream.of(generalOrdersRevenue, restaurantOrdersRevenue)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
+
+    }
+
+    public List<OrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName) {
+        var orderEnum = mapOrderType(storeName);
+        return getAllOrdersCountWindowsByType(storeName, orderEnum);
 
     }
 }

@@ -62,8 +62,8 @@ public class OrdersController {
 
     }
 
-    @GetMapping("/windows")
-    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindows(
+    @GetMapping("/windows/count")
+    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows(
             @RequestParam(value = "from_time", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime fromTime,
@@ -79,11 +79,11 @@ public class OrdersController {
 
     }
 
-    @GetMapping("/windows/{window_order_type}")
-    public List<AllOrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
-            @PathVariable("window_order_type") String orderType
+    @GetMapping("/windows/count/{window_order_type}")
+    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindowsType(
+            @PathVariable("window_order_type") String storeName
     ) {
-        return orderService.getAllOrdersCountWindowsByType(orderType, OrderType.RESTAURANT);
+        return orderService.getAllOrdersCountWindowsByType(storeName);
 
     }
 
