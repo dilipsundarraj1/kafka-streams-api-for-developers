@@ -1,8 +1,8 @@
 package com.learnkafkastreams.service;
 
 import com.learnkafkastreams.domain.OrderType;
-import com.learnkafkastreams.domain.OrdersCountPerStoreByWindows;
-import com.learnkafkastreams.domain.OrdersRevenuePerStoreByWindows;
+import com.learnkafkastreams.domain.OrdersCountPerStoreByWindowsDTO;
+import com.learnkafkastreams.domain.OrdersRevenuePerStoreByWindowsDTO;
 import com.learnkafkastreams.domain.TotalRevenue;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.kstream.Windowed;
@@ -33,7 +33,7 @@ public class OrdersWindowService {
         this.orderStoreService = orderStoreService;
     }
 
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String orderType) {
+    public List<OrdersCountPerStoreByWindowsDTO> getAllOrdersCountWindowsByType(String orderType) {
 
         var countWindowsStore = getCountWindowsStore(orderType);
 
@@ -44,7 +44,7 @@ public class OrdersWindowService {
         return StreamSupport.stream(spliterator, false)
                 .map(windowedLongKeyValue -> {
                     printLocalDateTimes(windowedLongKeyValue.key, windowedLongKeyValue.value);
-                    return new OrdersCountPerStoreByWindows(
+                    return new OrdersCountPerStoreByWindowsDTO(
                             windowedLongKeyValue.key.key(),
                             windowedLongKeyValue.value,
                             orderTypeEnum,
@@ -68,7 +68,7 @@ public class OrdersWindowService {
         };
     }
 
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows() {
+    public List<OrdersCountPerStoreByWindowsDTO> getAllOrdersCountByWindows() {
 
         var generalOrdersCountByWindows = getAllOrdersCountWindowsByType(GENERAL_ORDERS);
 
@@ -79,7 +79,7 @@ public class OrdersWindowService {
                 .collect(Collectors.toList());
     }
 
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows(LocalDateTime fromTime, LocalDateTime toTime) {
+    public List<OrdersCountPerStoreByWindowsDTO> getAllOrdersCountByWindows(LocalDateTime fromTime, LocalDateTime toTime) {
 
         var fromTimeInstant = fromTime.toInstant(ZoneOffset.UTC);
         var toTimeInstant = toTime.toInstant(ZoneOffset.UTC);
@@ -106,12 +106,12 @@ public class OrdersWindowService {
     }
 
 
-    private static List<OrdersCountPerStoreByWindows> mapToOrderCountPerStoreByWindows(KeyValueIterator<Windowed<String>, Long> ordersCountByWindows, OrderType orderType) {
+    private static List<OrdersCountPerStoreByWindowsDTO> mapToOrderCountPerStoreByWindows(KeyValueIterator<Windowed<String>, Long> ordersCountByWindows, OrderType orderType) {
         var spliterator = Spliterators.spliteratorUnknownSize(ordersCountByWindows, 0);
         return StreamSupport.stream(spliterator, false)
                 .map(windowedLongKeyValue -> {
                     printLocalDateTimes(windowedLongKeyValue.key, windowedLongKeyValue.value);
-                    return new OrdersCountPerStoreByWindows(
+                    return new OrdersCountPerStoreByWindowsDTO(
                             windowedLongKeyValue.key.key(),
                             windowedLongKeyValue.value,
                             orderType,
@@ -126,7 +126,7 @@ public class OrdersWindowService {
     }
 
 
-    public List<OrdersRevenuePerStoreByWindows> getAllOrdersRevenueWindowsByType(String orderType) {
+    public List<OrdersRevenuePerStoreByWindowsDTO> getAllOrdersRevenueWindowsByType(String orderType) {
 
         var revenueWindowsStore = getRevenueWindowsStore(orderType);
 
@@ -137,7 +137,7 @@ public class OrdersWindowService {
         return StreamSupport.stream(spliterator, false)
                 .map(windowedLongKeyValue -> {
                     printLocalDateTimes(windowedLongKeyValue.key, windowedLongKeyValue.value);
-                    return new OrdersRevenuePerStoreByWindows(
+                    return new OrdersRevenuePerStoreByWindowsDTO(
                             windowedLongKeyValue.key.key(),
                             windowedLongKeyValue.value,
                             orderTypeEnum,

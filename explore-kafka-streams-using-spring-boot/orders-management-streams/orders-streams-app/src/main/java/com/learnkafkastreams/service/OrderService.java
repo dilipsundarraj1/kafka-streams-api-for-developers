@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -103,7 +102,7 @@ public class OrderService {
 
     }
 
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName, OrderType orderType) {
+    public List<OrdersCountPerStoreByWindowsDTO> getAllOrdersCountWindowsByType(String storeName, OrderType orderType) {
         var ordersCountByWindows = orderStoreService
                 .ordersWindowCountStore(storeName)
                 .all();
@@ -111,12 +110,12 @@ public class OrderService {
         return mapToAllOrderCountPerStoreByWindows(ordersCountByWindows, orderType);
     }
 
-    private static List<OrdersCountPerStoreByWindows> mapToAllOrderCountPerStoreByWindows(KeyValueIterator<Windowed<String>, Long> ordersCountByWindows, OrderType orderType) {
+    private static List<OrdersCountPerStoreByWindowsDTO> mapToAllOrderCountPerStoreByWindows(KeyValueIterator<Windowed<String>, Long> ordersCountByWindows, OrderType orderType) {
         var spliterator = Spliterators.spliteratorUnknownSize(ordersCountByWindows, 0);
         return StreamSupport.stream(spliterator, false)
                 .map(windowedLongKeyValue -> {
                     printLocalDateTimes(windowedLongKeyValue.key, windowedLongKeyValue.value);
-                    return new OrdersCountPerStoreByWindows(
+                    return new OrdersCountPerStoreByWindowsDTO(
                             windowedLongKeyValue.key.key(),
                             windowedLongKeyValue.value,
                             orderType,
