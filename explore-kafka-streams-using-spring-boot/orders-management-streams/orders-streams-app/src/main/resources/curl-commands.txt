@@ -43,6 +43,15 @@ curl -i http://localhost:8080/v1/orders/revenue/restaurant_orders
 Sample JSON : 04-orders-revenue.json
 DTO: OrderRevenueDTO
 
+================
+Error Scenarios :|
+================
+curl -i http://localhost:8080/v1/orders/revenue/restaurant_orders
+
+curl -i -X POST http://localhost:8080/v1/orders/revenue/restaurant_orders
+
+
+
 ===============================
 Retrieve Revenue for All Types:|
 ===============================

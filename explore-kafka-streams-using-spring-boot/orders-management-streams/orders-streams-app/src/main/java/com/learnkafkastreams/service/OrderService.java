@@ -86,15 +86,13 @@ public class OrderService {
                 orderCountPerStoreDTO.orderCount(), orderType);
 
 
-        var generalOrders = orderStoreService.ordersCountStore(GENERAL_ORDERS_COUNT);
-        var restaurantOrders = orderStoreService.ordersCountStore(RESTAURANT_ORDERS_COUNT);
         var generalOrdersCount =
-                buildRecordsFromStore(generalOrders.all())
+                getOrdersCount(GENERAL_ORDERS)
                         .stream()
                         .map(orderCountPerStoreDTO -> mapper.apply(orderCountPerStoreDTO, OrderType.GENERAL))
                         .collect(Collectors.toList());
 
-        var restaurantOrdersCount = buildRecordsFromStore(restaurantOrders.all())
+        var restaurantOrdersCount =   getOrdersCount(RESTAURANT_ORDERS)
                 .stream()
                 .map(orderCountPerStoreDTO -> mapper.apply(orderCountPerStoreDTO, OrderType.RESTAURANT))
                 .toList();
@@ -104,19 +102,6 @@ public class OrderService {
         return generalOrdersCount;
 
     }
-
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows() {
-
-        var generalOrdersCountByWindows = getAllOrdersCountWindowsByType(GENERAL_ORDERS_COUNT_WINDOWS, OrderType.GENERAL);
-
-        var restaurantOrdersCountByWindows = getAllOrdersCountWindowsByType(RESTAURANT_ORDERS_COUNT_WINDOWS, OrderType.RESTAURANT);
-
-        return Stream.of(generalOrdersCountByWindows, restaurantOrdersCountByWindows)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-    }
-
-
 
     public List<OrdersCountPerStoreByWindows> getAllOrdersCountWindowsByType(String storeName, OrderType orderType) {
         var ordersCountByWindows = orderStoreService
@@ -145,37 +130,13 @@ public class OrderService {
                 .toList();
     }
 
-    public List<OrdersCountPerStoreByWindows> getAllOrdersCountByWindows(LocalDateTime fromTime, LocalDateTime toTime) {
-
-        var fromTimeInstant = fromTime.toInstant(ZoneOffset.UTC);
-        var toTimeInstant = toTime.toInstant(ZoneOffset.UTC);
-
-        log.info("fromTimeInstant : {} , toTimeInstant : {} ", fromTimeInstant, toTimeInstant);
-
-        var generalOrdersCountByWindows = orderStoreService
-                .ordersWindowCountStore(GENERAL_ORDERS_COUNT_WINDOWS)
-                .fetchAll(fromTimeInstant, toTimeInstant);
-
-        var generalAllOrderCountPerStoreByWindows = mapToAllOrderCountPerStoreByWindows(generalOrdersCountByWindows, OrderType.GENERAL);
-
-        var restaurantOrdersCountByWindows = orderStoreService
-                .ordersWindowCountStore(RESTAURANT_ORDERS_COUNT_WINDOWS)
-                .fetchAll(fromTimeInstant, toTimeInstant);
-        var restaurantOrderCountPerStoreByWindows = mapToAllOrderCountPerStoreByWindows(restaurantOrdersCountByWindows, OrderType.RESTAURANT);
-
-        return Stream.of(generalAllOrderCountPerStoreByWindows, restaurantOrderCountPerStoreByWindows)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-
-
-    }
 
     public List<OrderRevenueDTO> revenueByOrderType(String orderType) {
 
         var revenueStoreByType =getRevenueStore(orderType);
 
-        var revenueWithAddress = revenueStoreByType.all();
-        var spliterator = Spliterators.spliteratorUnknownSize(revenueWithAddress, 0);
+        var revenueIterator = revenueStoreByType.all();
+        var spliterator = Spliterators.spliteratorUnknownSize(revenueIterator, 0);
         return StreamSupport.stream(spliterator, false)
                 .map(keyValue ->
                         new OrderRevenueDTO(keyValue.key, mapOrderType(orderType), keyValue.value))

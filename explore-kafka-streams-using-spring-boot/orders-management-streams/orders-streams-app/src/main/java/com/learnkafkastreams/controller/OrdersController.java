@@ -34,6 +34,13 @@ public class OrdersController {
         }
     }
 
+    @GetMapping("/count")
+    public List<AllOrdersCountPerStoreDTO> allOrdersCount(
+    ) {
+        return orderService.getAllOrdersCount();
+
+    }
+
     @GetMapping("/revenue/{order_type}")
     public ResponseEntity<?> revenueByOrderType(
             @PathVariable("order_type") String orderType,
@@ -53,11 +60,6 @@ public class OrdersController {
         return orderService.allRevenue();
     }
 
-    @GetMapping("/count")
-    public List<AllOrdersCountPerStoreDTO> allOrdersCount(
-    ) {
-        return orderService.getAllOrdersCount();
 
-    }
 
 }
