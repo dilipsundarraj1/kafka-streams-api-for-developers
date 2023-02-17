@@ -33,7 +33,7 @@ public class OrdersWindowService {
         this.orderStoreService = orderStoreService;
     }
 
-    public List<OrdersCountPerStoreByWindowsDTO> getAllOrdersCountWindowsByType(String orderType) {
+    public List<OrdersCountPerStoreByWindowsDTO> getOrdersCountWindowsByType(String orderType) {
 
         var countWindowsStore = getCountWindowsStore(orderType);
 
@@ -70,9 +70,9 @@ public class OrdersWindowService {
 
     public List<OrdersCountPerStoreByWindowsDTO> getAllOrdersCountByWindows() {
 
-        var generalOrdersCountByWindows = getAllOrdersCountWindowsByType(GENERAL_ORDERS);
+        var generalOrdersCountByWindows = getOrdersCountWindowsByType(GENERAL_ORDERS);
 
-        var restaurantOrdersCountByWindows = getAllOrdersCountWindowsByType(RESTAURANT_ORDERS);
+        var restaurantOrdersCountByWindows = getOrdersCountWindowsByType(RESTAURANT_ORDERS);
 
         return Stream.of(generalOrdersCountByWindows, restaurantOrdersCountByWindows)
                 .flatMap(Collection::stream)

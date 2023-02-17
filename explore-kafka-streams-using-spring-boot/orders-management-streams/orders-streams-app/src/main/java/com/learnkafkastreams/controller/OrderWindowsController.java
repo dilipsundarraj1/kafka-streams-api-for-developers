@@ -22,11 +22,11 @@ public class OrderWindowsController {
     }
 
 
-    @GetMapping("/windows/count/{window_order_type}")
+    @GetMapping("/windows/count/{order_type}")
     public List<OrdersCountPerStoreByWindowsDTO> getAllOrdersCountByWindowsType(
-            @PathVariable("window_order_type") String orderType
+            @PathVariable("order_type") String orderType
     ) {
-        return ordersWindowService.getAllOrdersCountWindowsByType(orderType);
+        return ordersWindowService.getOrdersCountWindowsByType(orderType);
 
     }
 
@@ -47,9 +47,9 @@ public class OrderWindowsController {
 
     }
 
-    @GetMapping("/windows/revenue/{window_order_type}")
+    @GetMapping("/windows/revenue/{order_type}")
     public List<OrdersRevenuePerStoreByWindowsDTO> getAllOrdersRevenueByWindowsType(
-            @PathVariable("window_order_type") String orderType
+            @PathVariable("order_type") String orderType
     ) {
         return ordersWindowService.getAllOrdersRevenueWindowsByType(orderType);
 

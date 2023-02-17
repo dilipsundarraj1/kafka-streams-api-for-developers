@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,10 +25,8 @@ class OrdersTopologyTest {
     TopologyTestDriver topologyTestDriver = null;
     TestInputTopic<String, Order> ordersInputTopic = null;
 
-    TestInputTopic<String, Store> storesInputTopic = null;
     static String INPUT_TOPIC = ORDERS;
 
-    static String STORES_INPUT_TOPIC = STORES;
 
 
     @BeforeEach
@@ -39,11 +38,6 @@ class OrdersTopologyTest {
                         createInputTopic(
                                 INPUT_TOPIC, Serdes.String().serializer(), SerdesFactory.orderSerdes().serializer());
 
-
-        storesInputTopic =
-                topologyTestDriver.
-                        createInputTopic(
-                                STORES, Serdes.String().serializer(), SerdesFactory.storeSerdes().serializer());
 
     }
 
@@ -61,12 +55,10 @@ class OrdersTopologyTest {
                 "1234567890"
         );
 
-        storesInputTopic.pipeInput(store1.locationId(), store1);
 
         ordersInputTopic.pipeKeyValueList(orders());
 
         ReadOnlyKeyValueStore<String, TotalRevenue> generalOrdersRevenue = topologyTestDriver.getKeyValueStore(GENERAL_ORDERS_REVENUE);
-        System.out.println("ordersRevenueStore : " + generalOrdersRevenue);
 
         var generalOrderWithRevenue = generalOrdersRevenue.get("store_1234");
         assertEquals(1, generalOrderWithRevenue.runnuingOrderCount());
@@ -75,7 +67,6 @@ class OrdersTopologyTest {
 
 
         ReadOnlyKeyValueStore<String, TotalRevenue> restaurantOrdersRevenue = topologyTestDriver.getKeyValueStore(RESTAURANT_ORDERS_REVENUE);
-        System.out.println("restaurantOrdersRevenue : " + restaurantOrdersRevenue);
 
         var restaurantOrderWithRevenue = restaurantOrdersRevenue.get("store_1234");
         assertEquals(1, restaurantOrderWithRevenue.runnuingOrderCount());
@@ -92,10 +83,7 @@ class OrdersTopologyTest {
                 "1234567890"
         );
 
-        storesInputTopic.pipeInput(store1.locationId(), store1);
-
         ordersInputTopic.pipeKeyValueList(orders());
-
         ordersInputTopic.pipeKeyValueList(orders());
 
         ReadOnlyKeyValueStore<String, TotalRevenue> generalOrdersRevenue = topologyTestDriver.getKeyValueStore(GENERAL_ORDERS_REVENUE);
@@ -125,33 +113,46 @@ class OrdersTopologyTest {
                 "1234567890"
         );
 
-        storesInputTopic.pipeInput(store1.locationId(), store1);
-
         ordersInputTopic.pipeKeyValueList(orders());
         ordersInputTopic.pipeKeyValueList(orders());
-        //topologyTestDriver.advanceWallClockTime(Duration.ofSeconds(30));
+        topologyTestDriver.advanceWallClockTime(Duration.ofSeconds(30));
 
         var generalOrdersRevenue = topologyTestDriver.getWindowStore(GENERAL_ORDERS_REVENUE_WINDOWS);
         System.out.println("ordersRevenueStore : " + generalOrdersRevenue);
+
+
         generalOrdersRevenue
                 .all()
                 .forEachRemaining(totalRevenueKeyValue -> {
-                    System.out.println("Key : " + totalRevenueKeyValue.key);
-                    System.out.println("Value : " + totalRevenueKeyValue.value);
+                    System.out.println("general Key : " + totalRevenueKeyValue.key);
+                    System.out.println("Start Window : " + totalRevenueKeyValue.key.window().startTime());
+                    System.out.println("End Window : " + totalRevenueKeyValue.key.window().endTime());
+
+                    var record = generalOrdersRevenue
+                            .fetch("store_1234", totalRevenueKeyValue.key.window().startTime().toEpochMilli());
+                    System.out.println("record : "+ record);
+
+                    System.out.println("general Value : " + totalRevenueKeyValue.value);
+
+                    var totalRevenue = (TotalRevenue) totalRevenueKeyValue.value;
+                    assertEquals(2, totalRevenue.runnuingOrderCount());
+                    assertEquals(new BigDecimal("54.00"), totalRevenue.runningRevenue());
                 });
-
-//        var generalOrderWithRevenue = generalOrdersRevenue.get("store_1234");
-//        assertEquals(2, generalOrderWithRevenue.runnuingOrderCount());
-//        assertEquals(new BigDecimal("54.00"), generalOrderWithRevenue.runningRevenue());
-
 
 
         var restaurantOrdersRevenue = topologyTestDriver.getWindowStore(RESTAURANT_ORDERS_REVENUE_WINDOWS);
         System.out.println("restaurantOrdersRevenue : " + restaurantOrdersRevenue);
 
-//        var restaurantOrderWithRevenue = restaurantOrdersRevenue.get("store_1234");
-//        assertEquals(2, restaurantOrderWithRevenue.runnuingOrderCount());
-//        assertEquals(new BigDecimal("30.00"), restaurantOrderWithRevenue.runningRevenue());
+        restaurantOrdersRevenue
+                .all()
+                .forEachRemaining(totalRevenueKeyValue -> {
+                    System.out.println("restaurant Key : " + totalRevenueKeyValue.key);
+                    System.out.println("restaurant Value : " + totalRevenueKeyValue.value);
+
+                    var totalRevenue = (TotalRevenue) totalRevenueKeyValue.value;
+                    assertEquals(2, totalRevenue.runnuingOrderCount());
+                    assertEquals(new BigDecimal("30.00"), totalRevenue.runningRevenue());
+                });
 
     }
 
