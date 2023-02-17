@@ -5,6 +5,7 @@ spring:
     name: orders-kafka-streams
   profiles:
     active: local # this activates the profile
+server.port : 8081
 ---
 spring:
   config:

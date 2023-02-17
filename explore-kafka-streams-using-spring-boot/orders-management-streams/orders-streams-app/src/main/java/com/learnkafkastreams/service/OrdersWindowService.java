@@ -91,14 +91,14 @@ public class OrdersWindowService {
                 //.backwardAll() //This is to send the results in the reverse order
                 ;
 
-        var generalAllOrderCountPerStoreByWindows = mapToOrderCountPerStoreByWindows(generalOrdersCountByWindows, OrderType.GENERAL);
+        var generalOrdersCountByWindowsDTO = mapToOrderCountPerStoreByWindows(generalOrdersCountByWindows, OrderType.GENERAL);
 
-        var restaurantOrdersCountByWindows = getCountWindowsStore(RESTAURANT_ORDERS)
+        var restaurantOrdersCountByWindowsDTO = getCountWindowsStore(RESTAURANT_ORDERS)
                 .fetchAll(fromTimeInstant, toTimeInstant);
 
-        var restaurantOrderCountPerStoreByWindows = mapToOrderCountPerStoreByWindows(restaurantOrdersCountByWindows, OrderType.RESTAURANT);
+        var restaurantOrderCountPerStoreByWindows = mapToOrderCountPerStoreByWindows(restaurantOrdersCountByWindowsDTO, OrderType.RESTAURANT);
 
-        return Stream.of(generalAllOrderCountPerStoreByWindows, restaurantOrderCountPerStoreByWindows)
+        return Stream.of(generalOrdersCountByWindowsDTO, restaurantOrderCountPerStoreByWindows)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
@@ -126,7 +126,7 @@ public class OrdersWindowService {
     }
 
 
-    public List<OrdersRevenuePerStoreByWindowsDTO> getAllOrdersRevenueWindowsByType(String orderType) {
+    public List<OrdersRevenuePerStoreByWindowsDTO> getOrdersRevenueWindowsByType(String orderType) {
 
         var revenueWindowsStore = getRevenueWindowsStore(orderType);
 

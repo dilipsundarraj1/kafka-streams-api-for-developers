@@ -51,7 +51,7 @@ public class OrderWindowsController {
     public List<OrdersRevenuePerStoreByWindowsDTO> getAllOrdersRevenueByWindowsType(
             @PathVariable("order_type") String orderType
     ) {
-        return ordersWindowService.getAllOrdersRevenueWindowsByType(orderType);
+        return ordersWindowService.getOrdersRevenueWindowsByType(orderType);
 
     }
 
