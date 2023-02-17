@@ -1,19 +1,20 @@
 package com.learnkafkastreams.topology;
 
 import com.learnkafkastreams.domain.*;
-import com.learnkafkastreams.serdes.SerdesFactory;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.TestInputTopic;
 import org.apache.kafka.streams.TopologyTestDriver;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.kafka.support.serializer.JsonSerde;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,15 +27,23 @@ class OrdersTopologyTest {
     TestInputTopic<String, Order> ordersInputTopic = null;
 
     static String INPUT_TOPIC = ORDERS;
+    StreamsBuilder streamsBuilder;
+
+    OrdersTopology ordersTopology = new OrdersTopology();
+
+
 
     @BeforeEach
     void setUp() {
-        topologyTestDriver = new TopologyTestDriver(OrdersTopology.buildTopology());
+        streamsBuilder = new StreamsBuilder();
+        ordersTopology.process(streamsBuilder);
+        topologyTestDriver = new TopologyTestDriver(streamsBuilder.build());
 
         ordersInputTopic =
                 topologyTestDriver.
                         createInputTopic(
-                                INPUT_TOPIC, Serdes.String().serializer(), SerdesFactory.orderSerdes().serializer());
+                                INPUT_TOPIC, Serdes.String().serializer(),
+                                new JsonSerde<Order>(Order.class).serializer());
 
 
     }
@@ -45,9 +54,24 @@ class OrdersTopologyTest {
     }
 
     @Test
-    void ordersRevenue() {
+    void ordersCount() {
 
-        var address1 = new Address("1234 Street 1 ", "", "City1", "State1", "12345");
+        ordersInputTopic.pipeKeyValueList(orders());
+
+        ReadOnlyKeyValueStore<String, Long> generalOrdersCountStore = topologyTestDriver.getKeyValueStore(GENERAL_ORDERS_COUNT);
+
+        var generalOrdersCount = generalOrdersCountStore.get("store_1234");
+        assertEquals(1, generalOrdersCount);
+
+        ReadOnlyKeyValueStore<String, Long> restaurantOrdersStore = topologyTestDriver.getKeyValueStore(RESTAURANT_ORDERS_COUNT);
+
+        var restaurantOrdersCount = restaurantOrdersStore.get("store_1234");
+        assertEquals(1, restaurantOrdersCount);
+
+    }
+
+    @Test
+    void ordersRevenue() {
 
         ordersInputTopic.pipeKeyValueList(orders());
 
