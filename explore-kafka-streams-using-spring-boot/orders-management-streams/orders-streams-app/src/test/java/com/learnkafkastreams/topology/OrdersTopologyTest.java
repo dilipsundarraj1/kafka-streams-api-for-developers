@@ -141,15 +141,8 @@ class OrdersTopologyTest {
         generalOrdersRevenue
                 .all()
                 .forEachRemaining(totalRevenueKeyValue -> {
-                    System.out.println("general Key : " + totalRevenueKeyValue.key);
                     System.out.println("Start Window : " + totalRevenueKeyValue.key.window().startTime());
                     System.out.println("End Window : " + totalRevenueKeyValue.key.window().endTime());
-
-                    var record = generalOrdersRevenue
-                            .fetch("store_1234", totalRevenueKeyValue.key.window().startTime().toEpochMilli());
-                    System.out.println("record : "+ record);
-
-                    System.out.println("general Value : " + totalRevenueKeyValue.value);
 
                     var totalRevenue = (TotalRevenue) totalRevenueKeyValue.value;
                     assertEquals(2, totalRevenue.runnuingOrderCount());
