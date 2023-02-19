@@ -1,25 +1,17 @@
 package com.learnkafkastreams.topology;
 
-import com.learnkafkastreams.domain.*;
-import org.apache.kafka.common.serialization.Serdes;
+import com.learnkafkastreams.domain.Order;
+import com.learnkafkastreams.domain.OrderLineItem;
+import com.learnkafkastreams.domain.OrderType;
 import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.TestInputTopic;
 import org.apache.kafka.streams.TopologyTestDriver;
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.kafka.support.serializer.JsonSerde;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.learnkafkastreams.topology.OrdersTopology.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.learnkafkastreams.topology.OrdersTopology.ORDERS;
 
 class OrdersTopologyTest {
 
