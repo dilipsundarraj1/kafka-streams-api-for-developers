@@ -12,6 +12,8 @@ spring:
     activate:
       on-profile: local
   kafka:
+    consumer:
+      auto-offset-reset: earliest
     streams:
       bootstrap-servers: localhost:9092
       application-id: orders-kafka-streams

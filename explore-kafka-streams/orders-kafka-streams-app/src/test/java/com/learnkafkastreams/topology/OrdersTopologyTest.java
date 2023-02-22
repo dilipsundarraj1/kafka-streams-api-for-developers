@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static com.learnkafkastreams.topology.OrdersTopology.*;
@@ -45,9 +46,24 @@ class OrdersTopologyTest {
     }
 
     @Test
-    void ordersRevenue() {
+    void ordersCount() {
 
-        var address1 = new Address("1234 Street 1 ", "", "City1", "State1", "12345");
+        ordersInputTopic.pipeKeyValueList(orders());
+
+        ReadOnlyKeyValueStore<String, Long> generalOrdersCountStore = topologyTestDriver.getKeyValueStore(GENERAL_ORDERS_COUNT);
+
+        var generalOrdersCount = generalOrdersCountStore.get("store_1234");
+        assertEquals(1, generalOrdersCount);
+
+        ReadOnlyKeyValueStore<String, Long> restaurantOrdersStore = topologyTestDriver.getKeyValueStore(RESTAURANT_ORDERS_COUNT);
+
+        var restaurantOrdersCount = restaurantOrdersStore.get("store_1234");
+        assertEquals(1, restaurantOrdersCount);
+
+    }
+
+    @Test
+    void ordersRevenue() {
 
         ordersInputTopic.pipeKeyValueList(orders());
 
@@ -56,8 +72,6 @@ class OrdersTopologyTest {
         var generalOrderWithRevenue = generalOrdersRevenue.get("store_1234");
         assertEquals(1, generalOrderWithRevenue.runnuingOrderCount());
         assertEquals(new BigDecimal("27.00"), generalOrderWithRevenue.runningRevenue());
-
-
 
         ReadOnlyKeyValueStore<String, TotalRevenue> restaurantOrdersRevenue = topologyTestDriver.getKeyValueStore(RESTAURANT_ORDERS_REVENUE);
 
@@ -101,31 +115,26 @@ class OrdersTopologyTest {
     void ordersRevenue_byWindows() {
 
         var address1 = new Address("1234 Street 1 ", "", "City1", "State1", "12345");
-        var store1 = new Store("store_1234",
-                address1,
-                "1234567890"
-        );
 
         ordersInputTopic.pipeKeyValueList(orders());
         ordersInputTopic.pipeKeyValueList(orders());
-        topologyTestDriver.advanceWallClockTime(Duration.ofSeconds(30));
+        //topologyTestDriver.advanceWallClockTime(Duration.ofSeconds(30));
 
         var generalOrdersRevenue = topologyTestDriver.getWindowStore(GENERAL_ORDERS_REVENUE_WINDOWS);
-        System.out.println("ordersRevenueStore : " + generalOrdersRevenue);
-
 
         generalOrdersRevenue
                 .all()
                 .forEachRemaining(totalRevenueKeyValue -> {
-                    System.out.println("general Key : " + totalRevenueKeyValue.key);
-                    System.out.println("Start Window : " + totalRevenueKeyValue.key.window().startTime());
-                    System.out.println("End Window : " + totalRevenueKeyValue.key.window().endTime());
+                    var startTime = totalRevenueKeyValue.key.window().startTime();
+                    var endTime = totalRevenueKeyValue.key.window().endTime();
+                    System.out.println("startTime : " + startTime);
+                    System.out.println("endTime : " + endTime);
 
-                    var record = generalOrdersRevenue
-                            .fetch("store_1234", totalRevenueKeyValue.key.window().startTime().toEpochMilli());
-                    System.out.println("record : "+ record);
+                    var expectedStartTime = LocalDateTime.parse("2023-02-21T21:25:00");
+                    var expectedEndTime = LocalDateTime.parse("2023-02-21T21:25:15");
 
-                    System.out.println("general Value : " + totalRevenueKeyValue.value);
+                    assert LocalDateTime.ofInstant(startTime, ZoneId.of(ZoneId.SHORT_IDS.get("CST"))).equals(expectedStartTime);
+                    assert LocalDateTime.ofInstant(endTime, ZoneId.of(ZoneId.SHORT_IDS.get("CST"))).equals(expectedEndTime);
 
                     var totalRevenue = (TotalRevenue) totalRevenueKeyValue.value;
                     assertEquals(2, totalRevenue.runnuingOrderCount());
@@ -134,13 +143,18 @@ class OrdersTopologyTest {
 
 
         var restaurantOrdersRevenue = topologyTestDriver.getWindowStore(RESTAURANT_ORDERS_REVENUE_WINDOWS);
-        System.out.println("restaurantOrdersRevenue : " + restaurantOrdersRevenue);
 
         restaurantOrdersRevenue
                 .all()
                 .forEachRemaining(totalRevenueKeyValue -> {
-                    System.out.println("restaurant Key : " + totalRevenueKeyValue.key);
-                    System.out.println("restaurant Value : " + totalRevenueKeyValue.value);
+                    var startTime = totalRevenueKeyValue.key.window().startTime();
+                    var endTime = totalRevenueKeyValue.key.window().endTime();
+
+                    var expectedStartTime = LocalDateTime.parse("2023-02-21T21:25:00");
+                    var expectedEndTime = LocalDateTime.parse("2023-02-21T21:25:15");
+
+                    assert LocalDateTime.ofInstant(startTime, ZoneId.of(ZoneId.SHORT_IDS.get("CST"))).equals(expectedStartTime);
+                    assert LocalDateTime.ofInstant(endTime, ZoneId.of(ZoneId.SHORT_IDS.get("CST"))).equals(expectedEndTime);
 
                     var totalRevenue = (TotalRevenue) totalRevenueKeyValue.value;
                     assertEquals(2, totalRevenue.runnuingOrderCount());
@@ -148,7 +162,6 @@ class OrdersTopologyTest {
                 });
 
     }
-
 
     static List<KeyValue<String, Order>> orders(){
 
@@ -166,16 +179,16 @@ class OrdersTopologyTest {
                 new BigDecimal("27.00"),
                 OrderType.GENERAL,
                 orderItems,
-                LocalDateTime.now()
-                //LocalDateTime.now(ZoneId.of("UTC"))
+                //LocalDateTime.now()
+                LocalDateTime.parse("2023-02-21T21:25:01")
         );
 
         var order2 = new Order(54321, "store_1234",
                 new BigDecimal("15.00"),
                 OrderType.RESTAURANT,
                 orderItemsRestaurant,
-                LocalDateTime.now()
-                //LocalDateTime.now(ZoneId.of("UTC"))
+                //LocalDateTime.now()
+                LocalDateTime.parse("2023-02-21T21:25:01")
         );
         var keyValue1 = KeyValue.pair( order1.orderId().toString()
                 , order1);
