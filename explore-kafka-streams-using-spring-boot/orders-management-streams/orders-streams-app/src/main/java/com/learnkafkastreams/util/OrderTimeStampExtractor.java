@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 @Slf4j
@@ -15,12 +16,26 @@ public class OrderTimeStampExtractor implements TimestampExtractor {
         if(orderRecord!=null && orderRecord.orderedDateTime()!=null){
             var timeStamp = orderRecord.orderedDateTime();
             log.info("TimeStamp in extractor : {} ", timeStamp);
-            var instant = timeStamp.toInstant(ZoneOffset.ofHours(-6)).toEpochMilli();;
-           // var instant =  timeStamp.toInstant(ZoneOffset.UTC).toEpochMilli();
-            log.info("instant in extractor : {} ", instant);
-            return instant;
+            return convertToInstantUTCFromCST(timeStamp);
         }
         //fallback to stream time
         return partitionTime;
+    }
+
+    private static long convertToInstantUTCFromCST(LocalDateTime timeStamp) {
+        var instant = timeStamp.toInstant(ZoneOffset.ofHours(-6)).toEpochMilli();
+        log.info("instant in extractor : {} ", instant);
+        return instant;
+    }
+
+    /**
+     * Use this if the passed in time is also in UTC.
+     * @param timeStamp
+     * @return
+     */
+    private static long convertToInstantUTC(LocalDateTime timeStamp) {
+        var instant = timeStamp.toInstant(ZoneOffset.UTC).toEpochMilli();
+        log.info("instant in extractor : {} ", instant);
+        return instant;
     }
 }

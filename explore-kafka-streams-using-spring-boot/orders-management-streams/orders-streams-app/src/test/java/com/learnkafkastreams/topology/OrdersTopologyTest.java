@@ -184,7 +184,7 @@ class OrdersTopologyTest {
                 OrderType.GENERAL,
                 orderItems,
                 LocalDateTime.now()
-                //LocalDateTime.now(ZoneId.of("UTC"))
+                //LocalDateTime.parse("2023-02-21T21:25:01")
         );
 
         var order2 = new Order(54321, "store_1234",
@@ -192,7 +192,7 @@ class OrdersTopologyTest {
                 OrderType.RESTAURANT,
                 orderItemsRestaurant,
                 LocalDateTime.now()
-                //LocalDateTime.now(ZoneId.of("UTC"))
+                //LocalDateTime.parse("2023-02-21T21:25:01")
         );
         var keyValue1 = KeyValue.pair( order1.orderId().toString()
                 , order1);

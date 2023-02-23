@@ -135,7 +135,7 @@ public class OrdersTopology {
 
     private static void aggregateOrdersRevenueByWindows(KStream<String, Order> generalOrdersStream, String aggregateStoreName, KTable<String, Store> storesTable) {
 
-        var windowSize =30;
+        var windowSize =15;
         Duration windowSizeDuration = Duration.ofSeconds(windowSize);
         Duration graceWindowsSize = Duration.ofSeconds(5);
 
@@ -193,7 +193,7 @@ public class OrdersTopology {
 
     private static void aggregateOrdersCountByTimeWindows(KStream<String, Order> generalOrdersStream, String storeName) {
 
-        Duration windowSize = Duration.ofSeconds(30);
+        Duration windowSize = Duration.ofSeconds(15);
         Duration graceWindowsSize = Duration.ofSeconds(10);
 
         TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
