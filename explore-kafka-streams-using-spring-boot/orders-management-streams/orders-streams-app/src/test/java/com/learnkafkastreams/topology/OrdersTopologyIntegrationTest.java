@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestPropertySource(properties = {
         "spring.kafka.streams.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.producer.bootstrap-servers=${spring.embedded.kafka.brokers}"
-//        ,"spring.kafka.streams.auto-startup=false"
+ ,"spring.kafka.streams.auto-startup=false"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OrdersTopologyIntegrationTest {
@@ -62,7 +62,7 @@ public class OrdersTopologyIntegrationTest {
     OrdersWindowService ordersWindowService;
 
     @BeforeEach
-    public void cleanUp() {
+    public void setUp() {
 
         streamsBuilderFactoryBean.start();
 
