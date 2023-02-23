@@ -125,10 +125,6 @@ class OrdersTopologyTest {
     void ordersRevenue_byWindows() {
 
         var address1 = new Address("1234 Street 1 ", "", "City1", "State1", "12345");
-        var store1 = new Store("store_1234",
-                address1,
-                "1234567890"
-        );
 
         ordersInputTopic.pipeKeyValueList(orders());
         ordersInputTopic.pipeKeyValueList(orders());
@@ -183,16 +179,16 @@ class OrdersTopologyTest {
                 new BigDecimal("27.00"),
                 OrderType.GENERAL,
                 orderItems,
-                LocalDateTime.now()
-                //LocalDateTime.parse("2023-02-21T21:25:01")
+               // LocalDateTime.now()
+                LocalDateTime.parse("2023-02-21T21:25:01")
         );
 
         var order2 = new Order(54321, "store_1234",
                 new BigDecimal("15.00"),
                 OrderType.RESTAURANT,
                 orderItemsRestaurant,
-                LocalDateTime.now()
-                //LocalDateTime.parse("2023-02-21T21:25:01")
+                //LocalDateTime.now()
+                LocalDateTime.parse("2023-02-21T21:25:01")
         );
         var keyValue1 = KeyValue.pair( order1.orderId().toString()
                 , order1);
