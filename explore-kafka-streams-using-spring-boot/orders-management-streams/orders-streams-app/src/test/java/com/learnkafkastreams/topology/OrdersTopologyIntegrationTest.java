@@ -45,9 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class OrdersTopologyIntegrationTest {
 
     @Autowired
-    EmbeddedKafkaBroker embeddedKafkaBroker;
-
-    @Autowired
     KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
