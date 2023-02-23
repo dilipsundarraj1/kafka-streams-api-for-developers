@@ -17,6 +17,7 @@ spring:
     streams:
       bootstrap-servers: localhost:9092
       application-id: orders-kafka-streams
+      auto-startup: false
     properties:
       default:
         key:
