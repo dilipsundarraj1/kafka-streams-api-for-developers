@@ -4,6 +4,7 @@ import com.learnkafkastreams.exceptionhandler.StreamsProcessorCustomErrorHandler
 import com.learnkafkastreams.topology.OrdersTopology;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.streams.StreamsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ public class OrdersStreamsConfiguration {
 
         streamProperties.put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, RecoveringDeserializationExceptionHandler.class);
         streamProperties.put(RecoveringDeserializationExceptionHandler.KSTREAM_DESERIALIZATION_RECOVERER, consumerRecordRecoverer);
+        streamProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
 
         return new KafkaStreamsConfiguration(streamProperties);
     }

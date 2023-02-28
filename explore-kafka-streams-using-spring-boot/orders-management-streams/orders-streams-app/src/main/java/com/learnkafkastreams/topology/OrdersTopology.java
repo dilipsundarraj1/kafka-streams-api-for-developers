@@ -193,8 +193,8 @@ public class OrdersTopology {
 
     private static void aggregateOrdersCountByTimeWindows(KStream<String, Order> generalOrdersStream, String storeName) {
 
-        Duration windowSize = Duration.ofSeconds(15);
-        Duration graceWindowsSize = Duration.ofSeconds(10);
+        Duration windowSize = Duration.ofSeconds(60);
+        Duration graceWindowsSize = Duration.ofSeconds(15);
 
         TimeWindows hoppingWindow = TimeWindows.ofSizeAndGrace(windowSize, graceWindowsSize);
 
@@ -203,9 +203,10 @@ public class OrdersTopology {
                 .groupByKey(Grouped.with(Serdes.String(), new JsonSerde<>(Order.class)))
                 .windowedBy(hoppingWindow)
                 .count(Named.as(storeName), Materialized.as(storeName))
-                .suppress(Suppressed
-                        .untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull())
-                );
+//                .suppress(Suppressed
+//                        .untilWindowCloses(Suppressed.BufferConfig.unbounded().shutDownWhenFull())
+//                )
+                ;
 
         generalOrdersCount
                 .toStream()

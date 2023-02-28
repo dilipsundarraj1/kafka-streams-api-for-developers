@@ -5,7 +5,7 @@ spring:
     name: orders-kafka-streams
   profiles:
     active: local # this activates the profile
-server.port : 8081
+server.port : 8080
 ---
 spring:
   config:
@@ -13,10 +13,10 @@ spring:
       on-profile: local
   kafka:
     consumer:
-      auto-offset-reset: earliest
+      auto-offset-reset: latest
     streams:
       bootstrap-servers: localhost:9092
-      application-id: orders-kafka-streams
+      application-id: orders-kafka-streams5
     properties:
       default:
         key:

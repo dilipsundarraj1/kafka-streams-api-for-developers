@@ -94,6 +94,8 @@ curl -i http://localhost:8080/v1/orders/windows/count?from_time=2023-02-16T11:27
 
 curl -i http://localhost:8081/v1/orders/windows/count?from_time=2023-02-16T11:27:00&to_time=2023-02-16T11:27:00
 
+curl -i http://localhost:8081/v1/orders/windows/count?from_time=2023-02-25T11:29:00&to_time=2023-02-16T11:27:00
+
 Sample JSON: 05-orders-count-windows.json
 DTO : OrdersCountPerStoreByWindows
 
