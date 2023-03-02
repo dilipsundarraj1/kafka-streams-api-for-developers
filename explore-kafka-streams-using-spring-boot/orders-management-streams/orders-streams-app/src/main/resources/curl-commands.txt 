@@ -1,0 +1,112 @@
+===============================
+Retrieve Orders Count By Order Type: |
+===============================
+
+curl -i http://localhost:8080/v1/orders/count/general_orders
+
+curl -i http://localhost:8080/v1/orders/count/restaurant_orders
+
+Sample JSON: 01-orders-count.json
+DTO:OrderCountPerStoreDTO
+
+===================================================
+Retrieve Orders Count By Order Type & Location Id: |
+===================================================
+
+curl -i http://localhost:8080/v1/orders/count/general_orders?location_id=store_1234
+
+Sample JSON: 02-orders-count-by-locationid.json
+DTO: OrderCountPerStoreDTO
+
+No Matching Key:
+================
+curl -i http://localhost:8080/v1/orders/count/general_orders?location_id=store_9999
+
+
+=========================================
+Retrieve All Orders Count for All Types: |
+=========================================
+
+curl -i http://localhost:8080/v1/orders/count
+
+Sample JSON : 03-count-with-all-orders-types.json
+DTO: AllOrdersCountPerStoreDTO
+
+=========================
+Retrieve Revenue By Order Type:|
+=========================
+curl -i http://localhost:8080/v1/orders/revenue/general_orders
+
+
+curl -i http://localhost:8080/v1/orders/revenue/restaurant_orders
+
+Sample JSON : 04-orders-revenue.json
+DTO: OrderRevenueDTO
+
+================
+Error Scenarios :|
+================
+curl -i http://localhost:8080/v1/orders/revenue/restaurant_orders
+
+curl -i -X POST http://localhost:8080/v1/orders/revenue/restaurant_orders
+
+===============================
+Retrieve Revenue for All Types:|
+===============================
+
+curl -i http://localhost:8080/v1/orders/revenue
+
+Sample JSON : 04-orders-revenue.json
+DTO: OrderRevenueDTO
+
+=========
+WINDOWS:|
+=========
+
+===================================================
+Retrieve All Orders Count for  Windows by Order Type:|
+===================================================
+
+curl -i http://localhost:8080/v1/orders/windows/count/restaurant_orders
+
+curl -i http://localhost:8080/v1/orders/windows/count/general_orders
+
+Sample JSON: 05-orders-count-windows.json
+DTO : OrdersCountPerStoreByWindows
+
+===================================================
+Retrieve All Orders Count for All Types By Windows:|
+===================================================
+
+curl -i http://localhost:8080/v1/orders/windows/count
+
+Sample JSON: 05-orders-count-windows.json
+DTO : OrdersCountPerStoreByWindows
+
+==========================================================================
+Retrieve All Orders Count for  Windows by passing custom from and to time:|
+==========================================================================
+
+// start_time and to_times are inclusive in the result:
+
+Example: to_time=2023-02-14T11:33:30Z, If there is a start window with this value then it gets included in the fetched result.
+curl -i http://localhost:8080/v1/orders/windows/count?from_time=2023-02-16T11:27:00&to_time=2023-02-16T11:27:00
+
+curl -i http://localhost:8081/v1/orders/windows/count?from_time=2023-02-16T11:27:00&to_time=2023-02-16T11:27:00
+
+curl -i http://localhost:8081/v1/orders/windows/count?from_time=2023-02-25T11:29:00&to_time=2023-02-16T11:27:00
+
+Sample JSON: 05-orders-count-windows.json
+DTO : OrdersCountPerStoreByWindows
+
+
+===================================================
+Retrieve All Orders Revenue for  Windows by Order Type:|
+===================================================
+
+curl -i http://localhost:8080/v1/orders/windows/revenue/restaurant_orders
+
+curl -i http://localhost:8080/v1/orders/windows/revenue/general_orders
+
+Sample JSON: 06-orders-revenue-windows.json
+DTO : OrdersRevenuePerStoreByWindows

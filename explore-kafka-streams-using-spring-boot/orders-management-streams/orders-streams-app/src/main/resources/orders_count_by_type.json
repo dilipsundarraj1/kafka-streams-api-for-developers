@@ -1,0 +1,10 @@
+[
+  {
+    "locationId": "store_1234",
+    "orderCount": 100
+  },
+  {
+    "locationId": "store_4567",
+    "orderCount": 100
+  }
+]
