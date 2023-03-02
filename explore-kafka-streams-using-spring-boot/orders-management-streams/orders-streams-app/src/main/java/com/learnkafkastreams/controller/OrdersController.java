@@ -47,7 +47,7 @@ public class OrdersController {
             @RequestParam(value = "location_id", required = false) String locationId
     ) {
         if (StringUtils.hasLength(locationId)) {
-            return ResponseEntity.ok(orderService.getOrdersCountByLocationId(orderType, locationId));
+            return ResponseEntity.ok(orderService.getRevenueByLocationId(orderType, locationId));
         } else {
 
             return ResponseEntity.ok(orderService.revenueByOrderType(orderType));

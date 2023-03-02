@@ -143,6 +143,17 @@ public class OrderService {
 
     }
 
+    public OrderRevenueDTO getRevenueByLocationId(String orderType, String locationId) {
+        var revenueStoreByType =getRevenueStore(orderType);
+
+        var totalRevenue = revenueStoreByType.get(locationId);
+        if (totalRevenue != null) {
+            return new OrderRevenueDTO(locationId,mapOrderType(orderType), totalRevenue);
+        } else {
+            return null;
+        }
+    }
+
     public static OrderType mapOrderType(String orderType) {
         return switch (orderType) {
             case GENERAL_ORDERS -> OrderType.GENERAL;
@@ -161,6 +172,7 @@ public class OrderService {
                 .collect(Collectors.toList());
 
     }
+
 
 
 }
