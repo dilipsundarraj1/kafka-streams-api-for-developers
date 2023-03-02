@@ -1,0 +1,21 @@
+[
+  {
+    "locationId": "store_1234",
+    "totalRevenue": {
+      "locationId": "store_1234",
+      "runnuingOrderCount": 27,
+      "runningRevenue": 405.00
+    },
+    "orderType": "RESTAURANT",
+    "startWindow": "2023-02-16T11:27:00",
+    "endWindow": "2023-02-16T11:27:30"
+  },
+  {
+    "locationId": "store_1234",
+    "totalRevenue": {
+      "locationId": "store_1234",
+      "runnuingOrderCount": 29,
+      "runningRevenue": 435.00
+    }
+  }
+]

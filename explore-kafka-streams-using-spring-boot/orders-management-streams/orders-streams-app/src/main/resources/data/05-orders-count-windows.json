@@ -1,0 +1,16 @@
+[
+  {
+    "locationId": "store_1234",
+    "orderCount": 27,
+    "orderType": "RESTAURANT",
+    "startWindow": "2023-02-16T11:27:00",
+    "endWindow": "2023-02-16T11:27:30"
+  },
+  {
+    "locationId": "store_1234",
+    "orderCount": 29,
+    "orderType": "RESTAURANT",
+    "startWindow": "2023-02-16T11:27:30",
+    "endWindow": "2023-02-16T11:28:00"
+  }
+]
