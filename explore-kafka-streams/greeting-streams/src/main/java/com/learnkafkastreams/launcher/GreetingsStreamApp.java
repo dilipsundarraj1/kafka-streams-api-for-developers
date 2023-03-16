@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static com.learnkafkastreams.topology.GreetingsTopology.*;
+import static org.apache.kafka.streams.StreamsConfig.EXACTLY_ONCE_V2;
 
 @Slf4j
 public class GreetingsStreamApp {
@@ -33,6 +34,7 @@ public class GreetingsStreamApp {
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest"); // read only the new messages
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.StringSerde.class);
+        config.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, EXACTLY_ONCE_V2);
        // config.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, streamThreads+""); // read only the new messages
 
         //error-handling config
