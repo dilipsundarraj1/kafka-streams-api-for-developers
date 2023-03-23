@@ -3,8 +3,10 @@ Retrieve Orders Count By Order Type: |
 ===============================
 
 curl -i http://localhost:8080/v1/orders/count/general_orders
+curl -i http://localhost:8081/v1/orders/count/general_orders
 
 curl -i http://localhost:8080/v1/orders/count/restaurant_orders
+curl -i http://localhost:8081/v1/orders/count/restaurant_orders
 
 Sample JSON: 01-orders-count.json
 DTO:OrderCountPerStoreDTO
@@ -28,6 +30,7 @@ Retrieve All Orders Count for All Types: |
 =========================================
 
 curl -i http://localhost:8080/v1/orders/count
+curl -i http://localhost:8081/v1/orders/count
 
 Sample JSON : 03-count-with-all-orders-types.json
 DTO: AllOrdersCountPerStoreDTO
@@ -110,3 +113,25 @@ curl -i http://localhost:8080/v1/orders/windows/revenue/general_orders
 
 Sample JSON: 06-orders-revenue-windows.json
 DTO : OrdersRevenuePerStoreByWindows
+
+
+===================
+MetaData Endpoint:|
+===================
+
+curl -i http://localhost:8080/v1/metadata/all
+
+curl -i http://localhost:8080/v1/metadata/store_1234
+
+curl -i http://localhost:8080/v1/metadata/store_4567
+
+
+java -jar orders-streams-app/build/libs/orders-streams-app-0.0.1-SNAPSHOT.jar
+java -jar -Dserver.port=8081 orders-streams-app/build/libs/orders-streams-app-0.0.1-SNAPSHOT.jar
+
+
+curl -i http://localhost:8080/v1/orders/count/general_orders
+curl -i http://localhost:8081/v1/orders/count/general_orders
+curl -i http://dilips-mbp.lan:8080/v1/orders/count/general_orders
+
+curl -i http://192.168.86.188:8080/v1/orders/count/general_orders

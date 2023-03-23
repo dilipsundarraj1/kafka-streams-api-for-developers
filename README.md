@@ -109,7 +109,7 @@ kafka-topics --bootstrap-server localhost:9092 --list
 ```
 
 
-## KafkaStreams using SpringBoot 
+## KafkaStreams using SpringBoot
 
 ### How AutoConfiguration works ?
 
@@ -117,3 +117,5 @@ kafka-topics --bootstrap-server localhost:9092 --list
   - **KafkaStreamsAnnotationDrivenConfiguration** supplies the **KafkaStreamsConfiguration** bean
   - This class takes care of building the **StreamsBuilderFactoryBean** which is responsible for supplying the StreamsBuilder instance.
       - This **StreamsBuilderFactoryBean** class also takes care of managing the Lifecycle of the **KafkaStreams** App.
+
+## Interactive Queries with Multiple Instances of Kafka Streams using SpringBoot

@@ -28,7 +28,7 @@ public class OrdersMockDataProducer {
 
 
         publishOrders(objectMapper, buildOrders());
-        //publishBulkOrders(objectMapper);
+       // publishBulkOrders(objectMapper);
 
         /**
          * To test grace period.
@@ -38,7 +38,7 @@ public class OrdersMockDataProducer {
          *      - This should allow the aggregation to be added to the window before
          *
          */
-        publishOrdersToTestGrace(objectMapper, buildOrdersToTestGrace());
+        //publishOrdersToTestGrace(objectMapper, buildOrdersToTestGrace());
 
 
         //Future and Old Records
@@ -208,7 +208,7 @@ public class OrdersMockDataProducer {
                 //LocalDateTime.now(ZoneId.of("UTC"))
         );
 
-        var order2 = new Order(54321, "store_1234",
+        var order2 = new Order(100, "store_1234",
                 new BigDecimal("15.00"),
                 OrderType.RESTAURANT,
                 orderItemsRestaurant,
@@ -225,7 +225,7 @@ public class OrdersMockDataProducer {
                 //LocalDateTime.now(ZoneId.of("UTC"))
         );
 
-        var order4 = new Order(12345, "store_4567",
+        var order4 = new Order(100, "store_4567",
                 new BigDecimal("27.00"),
                 OrderType.RESTAURANT,
                 orderItems,

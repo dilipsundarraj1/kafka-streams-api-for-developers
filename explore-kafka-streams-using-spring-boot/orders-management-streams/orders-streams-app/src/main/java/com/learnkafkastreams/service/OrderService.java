@@ -1,12 +1,15 @@
 package com.learnkafkastreams.service;
 
+import com.learnkafkastreams.client.OrdersServiceClient;
 import com.learnkafkastreams.domain.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.streams.kstream.Windowed;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -21,22 +24,68 @@ import static com.learnkafkastreams.topology.OrdersTopology.*;
 @Slf4j
 public class OrderService {
     OrderStoreService orderStoreService;
+    MetaDataService metaDataService;
 
-    public OrderService(OrderStoreService orderStoreService) {
+    OrdersServiceClient ordersServiceClient;
 
+    public OrderService(OrderStoreService orderStoreService, MetaDataService metaDataService, OrdersServiceClient ordersServiceClient) {
         this.orderStoreService = orderStoreService;
+        this.metaDataService = metaDataService;
+        this.ordersServiceClient = ordersServiceClient;
     }
 
-    public List<OrderCountPerStoreDTO> getOrdersCount(String orderType) {
+    @Value("${server.port}")
+    private Integer port;
+
+
+    public List<OrderCountPerStoreDTO> getOrdersCount(String orderType, String queryOtherHosts) {
 
         ReadOnlyKeyValueStore<String, Long> orderStore = getOrderStore(orderType);
 
         var orders = orderStore.all();
         var spliterator = Spliterators.spliteratorUnknownSize(orders, 0);
-        return StreamSupport.stream(spliterator, false)
+        var orderCountPerStoreDTOListCurrentInstance = StreamSupport.stream(spliterator, false)
                 .map(keyValue ->
                         new OrderCountPerStoreDTO(keyValue.key, keyValue.value))
                 .collect(Collectors.toList());
+        log.info("orderCountPerStoreDTOListCurrentInstance : {}", orderCountPerStoreDTOListCurrentInstance);
+        var orderCountPerStoreDTOList = retrieveDataFromOtherInstances(orderType, Boolean.parseBoolean(queryOtherHosts));
+        log.info("orderCountPerStoreDTOList : {}", orderCountPerStoreDTOList);
+        return Stream.of(orderCountPerStoreDTOListCurrentInstance
+                       , orderCountPerStoreDTOList
+                )
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+    }
+
+    private List<OrderCountPerStoreDTO> retrieveDataFromOtherInstances(String orderType, Boolean queryOtherHosts) {
+        var otherHosts = otherHosts();
+        log.info("otherHosts : {}, queryOtherHosts: {}  ", otherHosts, queryOtherHosts);
+        if (queryOtherHosts && otherHosts != null) {
+            return otherHosts
+                    .stream()
+                    .map(hostInfoDTO -> ordersServiceClient.retrieveOrdersCountByOrderType(hostInfoDTO, orderType))
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    private List<HostInfoDTO> otherHosts() {
+        var hostInfoMetaData = metaDataService.getStreamsMetaData();
+        try {
+            //var currentMachinesHost = InetAddress.getLocalHost().getHostName();
+            var currentMachinesHost = "localhost";
+            return hostInfoMetaData
+                    .stream().filter(hostInfoDTO ->
+                            !(Objects.equals(hostInfoDTO.host(), currentMachinesHost) && hostInfoDTO.port() == port))
+                    .toList();
+        } catch (Exception e) {
+            log.error("Exception in otherHosts : {} ", e.getMessage(), e);
+        }
+        return null;
+
     }
 
     public List<OrderCountPerStoreDTO> buildRecordsFromStore(KeyValueIterator<String, Long> orderStore) {
@@ -86,12 +135,12 @@ public class OrderService {
 
 
         var generalOrdersCount =
-                getOrdersCount(GENERAL_ORDERS)
+                getOrdersCount(GENERAL_ORDERS, "false")
                         .stream()
                         .map(orderCountPerStoreDTO -> mapper.apply(orderCountPerStoreDTO, OrderType.GENERAL))
                         .collect(Collectors.toList());
 
-        var restaurantOrdersCount =   getOrdersCount(RESTAURANT_ORDERS)
+        var restaurantOrdersCount = getOrdersCount(RESTAURANT_ORDERS, "false")
                 .stream()
                 .map(orderCountPerStoreDTO -> mapper.apply(orderCountPerStoreDTO, OrderType.RESTAURANT))
                 .toList();
@@ -132,7 +181,7 @@ public class OrderService {
 
     public List<OrderRevenueDTO> revenueByOrderType(String orderType) {
 
-        var revenueStoreByType =getRevenueStore(orderType);
+        var revenueStoreByType = getRevenueStore(orderType);
 
         var revenueIterator = revenueStoreByType.all();
         var spliterator = Spliterators.spliteratorUnknownSize(revenueIterator, 0);
@@ -144,11 +193,11 @@ public class OrderService {
     }
 
     public OrderRevenueDTO getRevenueByLocationId(String orderType, String locationId) {
-        var revenueStoreByType =getRevenueStore(orderType);
+        var revenueStoreByType = getRevenueStore(orderType);
 
         var totalRevenue = revenueStoreByType.get(locationId);
         if (totalRevenue != null) {
-            return new OrderRevenueDTO(locationId,mapOrderType(orderType), totalRevenue);
+            return new OrderRevenueDTO(locationId, mapOrderType(orderType), totalRevenue);
         } else {
             return null;
         }
@@ -164,15 +213,14 @@ public class OrderService {
 
     public List<OrderRevenueDTO> allRevenue() {
 
-        var generalOrdersRevenue =revenueByOrderType(GENERAL_ORDERS);
-        var restaurantOrdersRevenue =revenueByOrderType(RESTAURANT_ORDERS);
+        var generalOrdersRevenue = revenueByOrderType(GENERAL_ORDERS);
+        var restaurantOrdersRevenue = revenueByOrderType(RESTAURANT_ORDERS);
 
         return Stream.of(generalOrdersRevenue, restaurantOrdersRevenue)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
     }
-
 
 
 }

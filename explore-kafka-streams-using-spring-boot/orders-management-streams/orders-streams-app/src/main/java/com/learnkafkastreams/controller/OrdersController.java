@@ -23,13 +23,18 @@ public class OrdersController {
     @GetMapping("/count/{order_type}")
     public ResponseEntity<?> ordersCount(
             @PathVariable("order_type") String orderType,
-            @RequestParam(value = "location_id", required = false) String locationId
+            @RequestParam(value = "location_id", required = false) String locationId,
+            @RequestParam(value = "query_other_hosts", required = false) String queryOtherHosts
     ) {
+        log.info("Inside ordersCount");
+        if (!StringUtils.hasText(queryOtherHosts)) {
+            queryOtherHosts = "true";
+        }
         if (StringUtils.hasLength(locationId)) {
             return ResponseEntity.ok(orderService.getOrdersCountByLocationId(orderType, locationId));
         } else {
 
-            return ResponseEntity.ok(orderService.getOrdersCount(orderType));
+            return ResponseEntity.ok(orderService.getOrdersCount(orderType, queryOtherHosts));
 
         }
     }
@@ -59,7 +64,6 @@ public class OrdersController {
     public List<OrderRevenueDTO> allRevenue() {
         return orderService.allRevenue();
     }
-
 
 
 }
