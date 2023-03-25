@@ -51,7 +51,8 @@ public class OrdersStreamsConfiguration {
         streamProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         log.info("HostName :  {} ,HostAddress : {}  ",InetAddress.getLocalHost().getHostName(), InetAddress.getLocalHost().getHostAddress() );
         //streamProperties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, InetAddress.getLocalHost().getHostName()+":"+port);
-        streamProperties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, "localhost:"+port);
+        streamProperties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, InetAddress.getLocalHost().getHostAddress()+":"+port);
+        //streamProperties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, "localhost:"+port);
         streamProperties.put(StreamsConfig.STATE_DIR_CONFIG, String.format("%s%s", springApplicationName, port));
 
         return new KafkaStreamsConfiguration(streamProperties);

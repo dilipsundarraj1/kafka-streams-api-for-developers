@@ -76,10 +76,11 @@ public class OrderService {
         var hostInfoMetaData = metaDataService.getStreamsMetaData();
         try {
             //var currentMachinesHost = InetAddress.getLocalHost().getHostName();
-            var currentMachinesHost = "localhost";
+            var currentMachineAddress = InetAddress.getLocalHost().getHostAddress();
+           // var currentMachineAddress = "localhost";
             return hostInfoMetaData
                     .stream().filter(hostInfoDTO ->
-                            !(Objects.equals(hostInfoDTO.host(), currentMachinesHost) && hostInfoDTO.port() == port))
+                            !(Objects.equals(hostInfoDTO.host(), currentMachineAddress) && hostInfoDTO.port() == port))
                     .toList();
         } catch (Exception e) {
             log.error("Exception in otherHosts : {} ", e.getMessage(), e);
