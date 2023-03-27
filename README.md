@@ -117,3 +117,19 @@ kafka-topics --bootstrap-server localhost:9092 --list
   - **KafkaStreamsAnnotationDrivenConfiguration** supplies the **KafkaStreamsConfiguration** bean
   - This class takes care of building the **StreamsBuilderFactoryBean** which is responsible for supplying the StreamsBuilder instance.
       - This **StreamsBuilderFactoryBean** class also takes care of managing the Lifecycle of the **KafkaStreams** App.
+
+
+## Interactive Queries with Multiple Instances of Kafka Streams using SpringBoot
+
+### Start up two instances of the application
+
+- **Instance 1** with the default port **8080**.
+
+```
+java -jar orders-streams-app/build/libs/orders-streams-app-0.0.1-SNAPSHOT.jar
+```
+- **Instance 2** with the port as **8081**.
+
+```
+java -jar -Dserver.port=8081 orders-streams-app/build/libs/orders-streams-app-0.0.1-SNAPSHOT.jar
+```
