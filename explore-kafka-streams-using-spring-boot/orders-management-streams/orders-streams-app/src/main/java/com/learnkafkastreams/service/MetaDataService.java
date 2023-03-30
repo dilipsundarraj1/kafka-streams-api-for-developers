@@ -35,9 +35,9 @@ public class MetaDataService {
 
     }
 
-    public HostInfoDTOWithKey getStreamsMetaDataForLocationId(String locationId){
-        var metaDataForKey= streamsBuilderFactoryBean.getKafkaStreams()
-                .queryMetadataForKey(GENERAL_ORDERS_COUNT, locationId, Serdes.String().serializer());
+    public HostInfoDTOWithKey getStreamsMetaDataForLocationId(String storeName, String locationId){
+        var metaDataForKey= Objects.requireNonNull(streamsBuilderFactoryBean.getKafkaStreams())
+                .queryMetadataForKey(storeName, locationId, Serdes.String().serializer());
 
         if(metaDataForKey!=null){
             var activeHost = metaDataForKey.activeHost();

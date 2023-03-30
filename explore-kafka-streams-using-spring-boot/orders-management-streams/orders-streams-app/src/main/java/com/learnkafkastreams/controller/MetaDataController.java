@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.learnkafkastreams.service.OrderService.mapOrderCountStoreName;
+
 @RestController
 @RequestMapping("/v1/metadata")
 public class MetaDataController {
@@ -25,8 +27,10 @@ public class MetaDataController {
         return metaDataService.getStreamsMetaData();
     }
 
-    @GetMapping("/{location_id}")
-    public HostInfoDTOWithKey getStreamsMetaDataForKey(@PathVariable("location_id") String locationId){
-        return metaDataService.getStreamsMetaDataForLocationId(locationId);
+    @GetMapping("{order_type}/{location_id}")
+    public HostInfoDTOWithKey getStreamsMetaDataForKey(@PathVariable("order_type") String orderType
+            ,@PathVariable("location_id") String locationId){
+
+        return metaDataService.getStreamsMetaDataForLocationId(mapOrderCountStoreName(orderType), locationId);
     }
 }

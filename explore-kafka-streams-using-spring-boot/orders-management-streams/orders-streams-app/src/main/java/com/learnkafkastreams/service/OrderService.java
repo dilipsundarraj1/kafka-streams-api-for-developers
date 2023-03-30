@@ -8,6 +8,7 @@ import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
@@ -26,6 +27,9 @@ public class OrderService {
     OrderStoreService orderStoreService;
     MetaDataService metaDataService;
 
+    @Value("${server.port}")
+    private Integer port;
+
     OrdersServiceClient ordersServiceClient;
 
     public OrderService(OrderStoreService orderStoreService, MetaDataService metaDataService, OrdersServiceClient ordersServiceClient) {
@@ -33,10 +37,6 @@ public class OrderService {
         this.metaDataService = metaDataService;
         this.ordersServiceClient = ordersServiceClient;
     }
-
-    @Value("${server.port}")
-    private Integer port;
-
 
     public List<OrderCountPerStoreDTO> getOrdersCount(String orderType, String queryOtherHosts) {
 
@@ -49,10 +49,15 @@ public class OrderService {
                         new OrderCountPerStoreDTO(keyValue.key, keyValue.value))
                 .collect(Collectors.toList());
         log.info("orderCountPerStoreDTOListCurrentInstance : {}", orderCountPerStoreDTOListCurrentInstance);
+        // fetch the data about other instances
+        // make the restcall to get the data from other instance
+        // make sure the other instance is not going to make any network calls to other instances
+        // aggregate the data.
+
         var orderCountPerStoreDTOList = retrieveDataFromOtherInstances(orderType, Boolean.parseBoolean(queryOtherHosts));
         log.info("orderCountPerStoreDTOList : {}", orderCountPerStoreDTOList);
         return Stream.of(orderCountPerStoreDTOListCurrentInstance
-                       , orderCountPerStoreDTOList
+                        , orderCountPerStoreDTOList
                 )
                 .filter(Objects::nonNull)
                 .flatMap(Collection::stream)
@@ -77,7 +82,7 @@ public class OrderService {
         try {
             //var currentMachinesHost = InetAddress.getLocalHost().getHostName();
             var currentMachineAddress = InetAddress.getLocalHost().getHostAddress();
-           // var currentMachineAddress = "localhost";
+            // var currentMachineAddress = "localhost";
             return hostInfoMetaData
                     .stream().filter(hostInfoDTO ->
                             !(Objects.equals(hostInfoDTO.host(), currentMachineAddress) && hostInfoDTO.port() == port))
@@ -100,14 +105,42 @@ public class OrderService {
     }
 
     public OrderCountPerStoreDTO getOrdersCountByLocationId(String orderType, String locationId) {
+        var storeName = mapOrderCountStoreName(orderType);
+        var hostMetaData = metaDataService.getStreamsMetaDataForLocationId(storeName, locationId);
+        log.info("hostMetaData : {} ", hostMetaData);
+        if (hostMetaData != null) {
+            if (hostMetaData.port() == port) {
+                log.info("Fetching the data from the current instance");
+                ReadOnlyKeyValueStore<String, Long> orderStore = getOrderStore(orderType);
+                var orderCount = orderStore.get(locationId);
+                if (orderCount != null) {
+                    return new OrderCountPerStoreDTO(locationId, orderCount);
+                } else {
+                    return null;
+                }
+            } else {
+                log.info("Fetching the data from the remote instance");
+                var orderCountPerStoreDTOList = ordersServiceClient.retrieveOrdersCountByOrderTypeAndLocationId(
+                        new HostInfoDTO(hostMetaData.host(), hostMetaData.port()),
+                        orderType, locationId);
+                if (!CollectionUtils.isEmpty(orderCountPerStoreDTOList)) {
+                    return orderCountPerStoreDTOList.get(0);
+                }
+                return null;
 
-        ReadOnlyKeyValueStore<String, Long> orderStore = getOrderStore(orderType);
-        var orderCount = orderStore.get(locationId);
-        if (orderCount != null) {
-            return new OrderCountPerStoreDTO(locationId, orderCount);
-        } else {
-            return null;
+            }
         }
+
+        return null;
+
+    }
+
+    public static String mapOrderCountStoreName(String orderType) {
+        return switch (orderType) {
+            case GENERAL_ORDERS -> GENERAL_ORDERS_COUNT;
+            case RESTAURANT_ORDERS ->RESTAURANT_ORDERS_COUNT;
+            default -> throw new IllegalStateException("Not a Valid Option");
+        };
     }
 
     private ReadOnlyKeyValueStore<String, Long> getOrderStore(String orderType) {

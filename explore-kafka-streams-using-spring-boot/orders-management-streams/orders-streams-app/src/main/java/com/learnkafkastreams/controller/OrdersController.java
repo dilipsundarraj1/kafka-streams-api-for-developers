@@ -26,14 +26,15 @@ public class OrdersController {
             @RequestParam(value = "location_id", required = false) String locationId,
             @RequestParam(value = "query_other_hosts", required = false) String queryOtherHosts
     ) {
-        log.info("Inside ordersCount");
+
         if (!StringUtils.hasText(queryOtherHosts)) {
             queryOtherHosts = "true";
         }
         if (StringUtils.hasLength(locationId)) {
+            log.info("Inside ordersCount by order type and location id");
             return ResponseEntity.ok(orderService.getOrdersCountByLocationId(orderType, locationId));
         } else {
-
+            log.info("Inside ordersCount by order type");
             return ResponseEntity.ok(orderService.getOrdersCount(orderType, queryOtherHosts));
 
         }

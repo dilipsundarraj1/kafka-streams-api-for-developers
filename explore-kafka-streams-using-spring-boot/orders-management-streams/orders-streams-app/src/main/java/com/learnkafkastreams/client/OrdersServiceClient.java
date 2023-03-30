@@ -36,4 +36,26 @@ public class OrdersServiceClient {
                 .collectList()
                 .block();
     }
+
+    public List<OrderCountPerStoreDTO> retrieveOrdersCountByOrderTypeAndLocationId(HostInfoDTO hostInfoDTO, String orderType, String locationId){
+
+        var basePath = "http://"+hostInfoDTO.host()+":"+ hostInfoDTO.port();
+        var url = UriComponentsBuilder
+                .fromHttpUrl(basePath)
+                .path("/v1/orders/count/{order_type}")
+                .queryParam("query_other_hosts", "false")
+                .queryParam("location_id", locationId)
+                .buildAndExpand( orderType)
+                .toString();
+
+        log.info("url : {} ", url);
+
+        return webClient
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToFlux(OrderCountPerStoreDTO.class)
+                .collectList()
+                .block();
+    }
 }
