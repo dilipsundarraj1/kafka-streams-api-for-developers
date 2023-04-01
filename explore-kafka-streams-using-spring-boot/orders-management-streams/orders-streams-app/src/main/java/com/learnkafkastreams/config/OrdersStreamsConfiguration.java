@@ -38,7 +38,7 @@ public class OrdersStreamsConfiguration {
 
         streamProperties.put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, RecoveringDeserializationExceptionHandler.class);
         streamProperties.put(RecoveringDeserializationExceptionHandler.KSTREAM_DESERIALIZATION_RECOVERER, consumerRecordRecoverer);
-        streamProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        //streamProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return new KafkaStreamsConfiguration(streamProperties);
     }
