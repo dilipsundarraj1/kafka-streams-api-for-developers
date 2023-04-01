@@ -48,7 +48,7 @@ public class OrdersStreamsConfiguration {
 
         streamProperties.put(StreamsConfig.DEFAULT_DESERIALIZATION_EXCEPTION_HANDLER_CLASS_CONFIG, RecoveringDeserializationExceptionHandler.class);
         streamProperties.put(RecoveringDeserializationExceptionHandler.KSTREAM_DESERIALIZATION_RECOVERER, consumerRecordRecoverer);
-        streamProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        //streamProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         log.info("HostName :  {} ,HostAddress : {}  ",InetAddress.getLocalHost().getHostName(), InetAddress.getLocalHost().getHostAddress() );
         //streamProperties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, InetAddress.getLocalHost().getHostName()+":"+port);
         streamProperties.put(StreamsConfig.APPLICATION_SERVER_CONFIG, InetAddress.getLocalHost().getHostAddress()+":"+port);
