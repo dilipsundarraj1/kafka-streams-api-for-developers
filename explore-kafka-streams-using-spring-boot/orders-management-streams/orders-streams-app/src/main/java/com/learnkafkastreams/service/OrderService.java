@@ -169,12 +169,12 @@ public class OrderService {
 
 
         var generalOrdersCount =
-                getOrdersCount(GENERAL_ORDERS, "false")
+                getOrdersCount(GENERAL_ORDERS, "true")
                         .stream()
                         .map(orderCountPerStoreDTO -> mapper.apply(orderCountPerStoreDTO, OrderType.GENERAL))
                         .collect(Collectors.toList());
 
-        var restaurantOrdersCount = getOrdersCount(RESTAURANT_ORDERS, "false")
+        var restaurantOrdersCount = getOrdersCount(RESTAURANT_ORDERS, "true")
                 .stream()
                 .map(orderCountPerStoreDTO -> mapper.apply(orderCountPerStoreDTO, OrderType.RESTAURANT))
                 .toList();
